@@ -97,12 +97,14 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rd party\includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -127,8 +129,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\3rd party\includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,7 +141,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Source\CollidableNode.cpp" />
+    <ClCompile Include="Source\GeometricMesh.cpp" />
+    <ClCompile Include="Source\GeometryNode.cpp" />
+    <ClCompile Include="Source\LightNode.cpp" />
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\OBJLoader.cpp" />
+    <ClCompile Include="Source\Renderer.cpp" />
+    <ClCompile Include="Source\ShaderProgram.cpp" />
+    <ClCompile Include="Source\TextureManager.cpp" />
+    <ClCompile Include="Source\Tools.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\CollidableNode.h" />
+    <ClInclude Include="Source\GeometricMesh.h" />
+    <ClInclude Include="Source\GeometryNode.h" />
+    <ClInclude Include="Source\LightNode.h" />
+    <ClInclude Include="Source\OBJLoader.h" />
+    <ClInclude Include="Source\Renderer.h" />
+    <ClInclude Include="Source\ShaderProgram.h" />
+    <ClInclude Include="Source\TextureManager.h" />
+    <ClInclude Include="Source\Tools.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Shaders\basic_rendering.frag" />
+    <None Include="Assets\Shaders\basic_rendering.vert" />
+    <None Include="Assets\Shaders\post_process.frag" />
+    <None Include="Assets\Shaders\post_process.vert" />
+    <None Include="Assets\Shaders\shadow_map_rendering.frag" />
+    <None Include="Assets\Shaders\shadow_map_rendering.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
