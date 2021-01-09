@@ -159,12 +159,8 @@ int main(int argc, char* argv[])
 			{
 				int x = event.motion.x;
 				int y = event.motion.y;
-
-				if (mouse_button_pressed)
-				{
-					renderer->CameraLook(prev_mouse_position - glm::vec2(x, y));
-					prev_mouse_position = glm::vec2(x, y);
-				}
+				renderer->CameraLook(prev_mouse_position - glm::vec2(x, y));
+				prev_mouse_position = glm::vec2(x, y);
 			}
 			else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
 			{

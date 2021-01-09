@@ -63,6 +63,21 @@ void Renderer::BuildWorld()
 	GeometryNode& wall = *this->m_nodes[OBJECS::WALLS];
 	GeometryNode& beam = *this->m_nodes[OBJECS::BEAM];*/
 
+	GeometryNode& beam = *this->m_nodes[MAP_ASSETS::BEAM];
+	GeometryNode& cannon = *this->m_nodes[MAP_ASSETS::CANNON];
+	GeometryNode& cannon_mount = *this->m_nodes[MAP_ASSETS::CANNON_MOUNT];
+
+	beam.model_matrix = glm::translate(glm::mat4(1.f), beam.m_aabb.center * glm::vec3(100.f));
+	beam.model_matrix;
+
+	/*beam.model_matrix = glm::scale(glm::mat4(1.f), glm::vec3(25.f));
+	beam.m_aabb.center = glm::vec3(beam.model_matrix * glm::vec4(beam.m_aabb.center, 1.f));*/
+
+	cannon.model_matrix = glm::mat4(1.f);
+	cannon_mount.model_matrix = glm::mat4(1.f);
+
+	this->m_world_matrix = glm::scale(glm::mat4(1.f), glm::vec3(0.05, 0.05, 0.05));
+
 	/*GeometryNode* beam;
 	for (int i = 0; i < 6; i++)
 	{
@@ -147,10 +162,10 @@ void Renderer::InitCamera()
 bool Renderer::InitLights()
 {
 	this->m_light.SetColor(glm::vec3(40.f));
-	this->m_light.SetPosition(glm::vec3(0, 3, 4.5));
+	this->m_light.SetPosition(glm::vec3(0, 3, 5));
 	this->m_light.SetTarget(glm::vec3(0));
-	this->m_light.SetConeSize(40, 50);
-	this->m_light.CastShadow(true);
+	this->m_light.SetConeSize(200, 200);
+	this->m_light.CastShadow(false);
 
 	return true;
 }
@@ -261,36 +276,36 @@ bool Renderer::InitGeometricMeshes()
 
 	std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets = {
 		"Assets/Beam/Beam.obj",
-		"Assets/Beam/CH-Beam.obj",
+		//"Assets/Beam/CH-Beam.obj",
 
 		"Assets/Cannon/Cannon.obj",
-		"Assets/Cannon/CH-Cannon.obj",
+		//"Assets/Cannon/CH-Cannon.obj",
 
 		"Assets/Cannon/CannonMount.obj",
-		"Assets/Cannon/CH-CannonMount.obj",
+		//"Assets/Cannon/CH-CannonMount.obj",
 
-		"Assets/Corridor/Corridor_Curve.obj",
+		//"Assets/Corridor/Corridor_Curve.obj",
 
-		"Assets/Corridor/Corridor_Fork.obj",
-		"Assets/Corridor/CH-Corridor_Fork.obj",
+		//"Assets/Corridor/Corridor_Fork.obj",
+		//"Assets/Corridor/CH-Corridor_Fork.obj",
 
-		"Assets/Corridor/Corridor_Straight.obj",
-		"Assets/Corridor/CH-Corridor_Straight.obj",
+		//"Assets/Corridor/Corridor_Straight.obj",
+		//"Assets/Corridor/CH-Corridor_Straight.obj",
 
-		"Assets/Corridor/Corridor_Left.obj",
-		"Assets/Corridor/CH-Corridor_Left.obj",
+		//"Assets/Corridor/Corridor_Left.obj",
+		//"Assets/Corridor/CH-Corridor_Left.obj",
 
-		"Assets/Corridor/Corridor_Right.obj",
-		"Assets/Corridor/CH-Corridor_Right.obj",
+		//"Assets/Corridor/Corridor_Right.obj",
+		//"Assets/Corridor/CH-Corridor_Right.obj",
 		
-		"Assets/Iris/Iris.obj",
-		"Assets/Iris/CH-Iris.obj",
+		//"Assets/Iris/Iris.obj",
+		//"Assets/Iris/CH-Iris.obj",
 
-		"Assets/Pipe/Pipe.obj",
-		"Assets/Pipe/CH-Pipe.obj",
+		//"Assets/Pipe/Pipe.obj",
+		//"Assets/Pipe/CH-Pipe.obj",
 
-		"Assets/Wall/Wall.obj",
-		"Assets/Wall/CH-Wall.obj",
+		//"Assets/Wall/Wall.obj",
+		//"Assets/Wall/CH-Wall.obj",
 	};
 
 	bool initialized = true;
@@ -341,6 +356,8 @@ void Renderer::UpdateGeometry(float dt)
 	GeometryNode& floor = *this->m_nodes[OBJECS::FLOOR];
 	GeometryNode& beam = *this->m_nodes[OBJECS::BEAM];*/
 
+	GeometryNode& beam = *this->m_nodes[MAP_ASSETS::BEAM];
+
 	
 
 	/*bunny.app_model_matrix =
@@ -353,11 +370,9 @@ void Renderer::UpdateGeometry(float dt)
 		glm::translate(glm::mat4(1.f), ball.m_aabb.center) *
 		glm::rotate(glm::mat4(1.f), m_continous_time, glm::vec3(.5f, .5f, 0.f)) *
 		glm::translate(glm::mat4(1.f), -ball.m_aabb.center) *
-		ball.model_matrix;
+		ball.model_matrix;*/
 
-	beam.app_model_matrix = /*glm::translate(glm::mat4(1.f), beam.m_aabb.center) *
-		glm::rotate(glm::mat4(1.f), m_continous_time, glm::vec3(1.f, 0.f, 0.f)) *
-		glm::translate(glm::mat4(1.f), -beam.m_aabb.center)
+	/*beam.app_model_matrix = glm::translate(glm::mat4(1.f), beam.m_aabb.center*glm::vec3(10.f);
 		beam.model_matrix;*/
 }
 
@@ -635,5 +650,5 @@ void Renderer::CameraMoveRight(bool enable)
 
 void Renderer::CameraLook(glm::vec2 lookDir)
 {
-	m_camera_look_angle_destination = lookDir;
+	m_camera_look_angle_destination = lookDir/glm::vec2(5);
 }

@@ -8,10 +8,10 @@ LightNode::LightNode()
 	m_name = "defaultSpotLight1";
 
 	m_light_direction = glm::normalize(glm::vec3(-1, -1, 0));
-	m_light_position = glm::vec3(5, 3, 0);
+	m_light_position = glm::vec3(0, 0, 0);
 	m_light_color = glm::vec3(1.0f);
 	SetPosition(m_light_position);
-	SetConeSize(60, 60);
+	SetConeSize(5, 5);
 
 	m_cast_shadow = false;
 	m_shadow_map_resolution = 1024;
