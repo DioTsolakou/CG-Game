@@ -56,107 +56,31 @@ bool Renderer::Init(int SCREEN_WIDTH, int SCREEN_HEIGHT)
 
 void Renderer::BuildWorld()
 {
-	/*GeometryNode& bunny = *this->m_nodes[OBJECS::BUNNY];
-	GeometryNode& ball = *this->m_nodes[OBJECS::BALL];
-	GeometryNode& chair = *this->m_nodes[OBJECS::CHAIR];
-	GeometryNode& floor = *this->m_nodes[OBJECS::FLOOR];
-	GeometryNode& wall = *this->m_nodes[OBJECS::WALLS];
-	GeometryNode& beam = *this->m_nodes[OBJECS::BEAM];*/
-
 	GeometryNode& beam = *this->m_nodes[MAP_ASSETS::BEAM];
 	GeometryNode& cannon = *this->m_nodes[MAP_ASSETS::CANNON];
 	GeometryNode& cannon_mount = *this->m_nodes[MAP_ASSETS::CANNON_MOUNT];
 
-	beam.model_matrix = glm::translate(glm::mat4(1.f), beam.m_aabb.center * glm::vec3(100.f));
-	beam.model_matrix;
+	//beam.model_matrix = glm::rotate(glm::mat4(1.f), glm::radians(45.f), glm::vec3(0.f, 0.f, 1.f));
+	//beam.m_aabb.center = glm::vec3(beam.model_matrix * glm::vec4(beam.m_aabb.center, 1.f));
 
-	/*beam.model_matrix = glm::scale(glm::mat4(1.f), glm::vec3(25.f));
-	beam.m_aabb.center = glm::vec3(beam.model_matrix * glm::vec4(beam.m_aabb.center, 1.f));*/
+	beam.model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(5.f, 0.f, 0.f));
+	beam.m_aabb.center = glm::vec3(beam.model_matrix * glm::vec4(beam.m_aabb.center, 1.f));
 
 	cannon.model_matrix = glm::mat4(1.f);
 	cannon_mount.model_matrix = glm::mat4(1.f);
 
-	this->m_world_matrix = glm::scale(glm::mat4(1.f), glm::vec3(0.05, 0.05, 0.05));
-
-	/*GeometryNode* beam;
-	for (int i = 0; i < 6; i++)
-	{
-		*(beam + i) = *this->m_nodes[BEAM];
-	}
-
-	GeometryNode* cannon;
-	GeometryNode* cannonMount;
-
-	GeometryNode* corridorCurve;
-	for (int i = 0; i < 18; i++)
-	{
-		*(corridorCurve + i) = *this->m_nodes[CORRIDOR_CURVE];
-	}
-
-	GeometryNode* corridorFork;
-	for (int i = 0; i < 4; i++)
-	{
-		*(corridorFork + i) = *this->m_nodes[CORRIDOR_FORK];
-	}
-
-	GeometryNode* corridorStraight;
-	for (int i = 0; i < 41; i++)
-	{
-		*(corridorStraight + i) = *this->m_nodes[CORRIDOR_STRAIGHT];
-	}
-
-	GeometryNode* corridorLeft;
-	for (int i = 0; i < 16; i++)
-	{
-		*(corridorLeft + i) = *this->m_nodes[CORRIDOR_LEFT];
-	}
-
-	GeometryNode* corridorRight;
-	for (int i = 0; i < 5; i++)
-	{
-		*(corridorRight + i) = *this->m_nodes[CORRIDOR_RIGHT];
-	}
-
-	GeometryNode* iris;
-	GeometryNode* wall;
-
-	GeometryNode* pipe;
-	for (int i = 0; i < 3; i++)
-	{
-		*(pipe + i) = *this->m_nodes[PIPE];
-	}*/
-
-
-	/*ball.model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 35.f, 0.f));
-	ball.m_aabb.center = glm::vec3(ball.model_matrix * glm::vec4(ball.m_aabb.center, 1.f));
-
-	chair.model_matrix = glm::mat4(1.f);
-	floor.model_matrix = glm::mat4(1.f);
-	wall.model_matrix = glm::mat4(1.f);
-
-	beam.model_matrix =
-		glm::translate(glm::mat4(1.f), glm::vec3(0.f, 50.f, 60.f)) *
-		glm::scale(glm::mat4(1.f), glm::vec3(2.5f));
-	beam.m_aabb.center = glm::vec3(beam.model_matrix * glm::vec4(beam.m_aabb.center, 1.f));
-
-	this->m_world_matrix = glm::scale(glm::mat4(1.f), glm::vec3(0.02, 0.02, 0.02));*/
+	this->m_world_matrix = glm::mat4(1.f);
 }
 
 void Renderer::InitCamera()
 {
-	this->m_camera_position = glm::vec3(2, 2, 4.5);
-	this->m_camera_target_position = glm::vec3(0, 0, 0);
+	this->m_camera_position = glm::vec3(0, 0, 0);
+	this->m_camera_target_position = glm::vec3(0, 0, 0.1);
 	this->m_camera_up_vector = glm::vec3(0, 1, 0);
 
-	this->m_view_matrix = glm::lookAt(
-		this->m_camera_position,
-		this->m_camera_target_position,
-		m_camera_up_vector);
+	this->m_view_matrix = glm::lookAt(this->m_camera_position, this->m_camera_target_position, m_camera_up_vector);
 
-	this->m_projection_matrix = glm::perspective(
-		glm::radians(45.f),
-		this->m_screen_width / (float)this->m_screen_height,
-		0.1f, 100.f);
+	this->m_projection_matrix = glm::perspective(glm::radians(90.f), this->m_screen_width / (float)this->m_screen_height, 0.1f, 10000.f);
 }
 
 bool Renderer::InitLights()
@@ -266,14 +190,6 @@ bool Renderer::InitCommonItems()
 
 bool Renderer::InitGeometricMeshes()
 {
-	/*std::array<const char*, OBJECS::SIZE_ALL> assets = {
-		"Assets/bunny_scene/bunny.obj",
-		"Assets/bunny_scene/ball.obj",
-		"Assets/bunny_scene/chair.obj",
-		"Assets/bunny_scene/floor.obj",
-		"Assets/bunny_scene/env2.obj", 
-		"Assets/bunny_scene/beam.obj", };*/
-
 	std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets = {
 		"Assets/Beam/Beam.obj",
 		//"Assets/Beam/CH-Beam.obj",
@@ -284,27 +200,27 @@ bool Renderer::InitGeometricMeshes()
 		"Assets/Cannon/CannonMount.obj",
 		//"Assets/Cannon/CH-CannonMount.obj",
 
-		//"Assets/Corridor/Corridor_Curve.obj",
+		"Assets/Corridor/Corridor_Curve.obj",
 
-		//"Assets/Corridor/Corridor_Fork.obj",
+		"Assets/Corridor/Corridor_Fork.obj",
 		//"Assets/Corridor/CH-Corridor_Fork.obj",
 
-		//"Assets/Corridor/Corridor_Straight.obj",
+		"Assets/Corridor/Corridor_Straight.obj",
 		//"Assets/Corridor/CH-Corridor_Straight.obj",
 
-		//"Assets/Corridor/Corridor_Left.obj",
+		"Assets/Corridor/Corridor_Left.obj",
 		//"Assets/Corridor/CH-Corridor_Left.obj",
 
-		//"Assets/Corridor/Corridor_Right.obj",
+		"Assets/Corridor/Corridor_Right.obj",
 		//"Assets/Corridor/CH-Corridor_Right.obj",
 		
-		//"Assets/Iris/Iris.obj",
+		"Assets/Iris/Iris.obj",
 		//"Assets/Iris/CH-Iris.obj",
 
-		//"Assets/Pipe/Pipe.obj",
+		"Assets/Pipe/Pipe.obj",
 		//"Assets/Pipe/CH-Pipe.obj",
 
-		//"Assets/Wall/Wall.obj",
+		"Assets/Wall/Wall.obj",
 		//"Assets/Wall/CH-Wall.obj",
 	};
 
@@ -357,7 +273,6 @@ void Renderer::UpdateGeometry(float dt)
 	GeometryNode& beam = *this->m_nodes[OBJECS::BEAM];*/
 
 	GeometryNode& beam = *this->m_nodes[MAP_ASSETS::BEAM];
-
 	
 
 	/*bunny.app_model_matrix =
@@ -372,8 +287,8 @@ void Renderer::UpdateGeometry(float dt)
 		glm::translate(glm::mat4(1.f), -ball.m_aabb.center) *
 		ball.model_matrix;*/
 
-	/*beam.app_model_matrix = glm::translate(glm::mat4(1.f), beam.m_aabb.center*glm::vec3(10.f);
-		beam.model_matrix;*/
+	beam.app_model_matrix = glm::translate(glm::mat4(1.f), beam.m_aabb.center*glm::vec3(10.f));
+	beam.model_matrix;
 }
 
 void Renderer::UpdateCamera(float dt)
@@ -650,5 +565,5 @@ void Renderer::CameraMoveRight(bool enable)
 
 void Renderer::CameraLook(glm::vec2 lookDir)
 {
-	m_camera_look_angle_destination = lookDir/glm::vec2(5);
+	m_camera_look_angle_destination = lookDir;
 }

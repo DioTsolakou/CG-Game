@@ -22,13 +22,7 @@ void CollidableNode::Init(class GeometricMesh* mesh)
     super::Init(mesh);
 }
 
-bool CollidableNode::intersectRay(
-    const glm::vec3& pOrigin_wcs,
-    const glm::vec3& pDir_wcs,
-    const glm::mat4& pWorldMatrix,
-    float & pIsectDist,
-    float pTmax,
-    float pTmin)
+bool CollidableNode::intersectRay(const glm::vec3& pOrigin_wcs, const glm::vec3& pDir_wcs, const glm::mat4& pWorldMatrix, float & pIsectDist, float pTmax, float pTmin)
 {
     if(pTmax < pTmin || glm::length(pDir_wcs) < glm::epsilon<float>()) return false;
 
