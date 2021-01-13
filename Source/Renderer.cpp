@@ -74,13 +74,18 @@ void Renderer::BuildWorld()
 
 void Renderer::InitCamera()
 {
+	this->FOV = 90.f;
+	this->aspectRatio = this->m_screen_width / (float)this->m_screen_height;
+	this->nearPlane = 0.1f;
+	this->farPlane = 10000.f;
+
 	this->m_camera_position = glm::vec3(0, 0, 0);
 	this->m_camera_target_position = glm::vec3(0, 0, 0.1);
 	this->m_camera_up_vector = glm::vec3(0, 1, 0);
 
 	this->m_view_matrix = glm::lookAt(this->m_camera_position, this->m_camera_target_position, m_camera_up_vector);
 
-	this->m_projection_matrix = glm::perspective(glm::radians(90.f), this->m_screen_width / (float)this->m_screen_height, 0.1f, 10000.f);
+	this->m_projection_matrix = glm::perspective(glm::radians(FOV), aspectRatio, nearPlane, farPlane);
 }
 
 bool Renderer::InitLights()
@@ -264,6 +269,63 @@ void Renderer::Update(float dt)
 	m_continous_time += dt;
 }
 
+void Renderer::drawCrosshair()
+{
+	glPushMatrix();
+	glViewport(0, 0, this->m_screen_width, this->m_screen_height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, this->m_screen_width, this->m_screen_height, 0, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glColor3ub(240, 240, 240);//white
+	glLineWidth(2.0);
+
+	int crossHair[8] =
+	{
+	this->m_screen_width / 2 - 7, this->m_screen_height / 2, // horizontal line
+	this->m_screen_width / 2 + 7, this->m_screen_height / 2,
+
+	this->m_screen_width / 2, this->m_screen_height / 2 + 7, //vertical line
+	this->m_screen_width / 2, this->m_screen_height / 2 - 7
+	};
+
+	// activate vertex array state and assign pointer to vertext array data
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	glVertexPointer(2, GL_INT, 0, crossHair);
+
+	//draw primitive GL_LINES starting at the first vertex, use 2 total vertices
+	glDrawArrays(GL_LINES, 0, 2); //draw horizontal line
+	//Same as above but start at second vertex
+	glDrawArrays(GL_LINES, 2, 2); //draw vertical line
+
+	// deactivate vertex array state after drawing
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glPopMatrix();
+}
+
+//void Renderer::crosshair()
+//{
+//	glMatrixMode(GL_PROJECTION);
+//	glLoadIdentity();
+//	gluPerspective(this->FOV, this->aspectRatio, this->nearPlane, this->farPlane);
+//
+//	glMatrixMode(GL_MODELVIEW);
+//	glLoadIdentity();
+//
+//	glMatrixMode(GL_PROJECTION);
+//	glLoadIdentity();
+//
+//	glOrtho(0.f, this->m_screen_width, this->m_screen_height, 0.f, 0.f, 1.f);
+//	
+//	glMatrixMode(GL_MODELVIEW);
+//	glLoadIdentity();
+//
+//	drawCrosshair();
+//}
+
 void Renderer::UpdateGeometry(float dt)
 {
 	/*GeometryNode& bunny = *this->m_nodes[OBJECS::BUNNY];
@@ -273,7 +335,6 @@ void Renderer::UpdateGeometry(float dt)
 	GeometryNode& beam = *this->m_nodes[OBJECS::BEAM];*/
 
 	GeometryNode& beam = *this->m_nodes[MAP_ASSETS::BEAM];
-	
 
 	/*bunny.app_model_matrix =
 		glm::translate(glm::mat4(1.f), bunny.m_aabb.center) *
@@ -565,5 +626,5 @@ void Renderer::CameraMoveRight(bool enable)
 
 void Renderer::CameraLook(glm::vec2 lookDir)
 {
-	m_camera_look_angle_destination = lookDir;
+	m_camera_look_angle_destination = lookDir * glm::vec2(1.5f, 1.5f);
 }

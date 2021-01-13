@@ -46,11 +46,17 @@ bool init()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
+	// set relative mouse movement mode
+	SDL_SetRelativeMouseMode(SDL_TRUE);
+
 	// Create Window
 	window = SDL_CreateWindow("OpenGL Lab 3",
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 		SCREEN_WIDTH, SCREEN_HEIGHT,
 		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+
+	// sets proper fullscreen
+	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
 	if (window == NULL)
 	{
@@ -86,6 +92,78 @@ bool init()
 	return engine_initialized;
 }
 
+void keyboardInput(bool &quit)
+{
+	if (event.type == SDL_KEYDOWN)
+	{
+		if (event.key.keysym.sym == SDLK_ESCAPE) quit = true;
+		if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP)
+		{
+			renderer->CameraMoveForward(true);
+		}
+		else if (event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN)
+		{
+			renderer->CameraMoveBackWard(true);
+		}
+		else if (event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_LEFT)
+		{
+			renderer->CameraMoveLeft(true);
+		}
+		else if (event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_RIGHT)
+		{
+			renderer->CameraMoveRight(true);
+		}
+		else if (event.key.keysym.sym == SDLK_r) renderer->ReloadShaders();
+	}
+	else if (event.type == SDL_KEYUP)
+	{
+		if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP)
+		{
+			renderer->CameraMoveForward(false);
+		}
+		else if (event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN)
+		{
+			renderer->CameraMoveBackWard(false);
+		}
+		else if (event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_LEFT)
+		{
+			renderer->CameraMoveLeft(false);
+		}
+		else if (event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_RIGHT)
+		{
+			renderer->CameraMoveRight(false);
+		}
+	}
+}
+
+void mouseInput(bool &mouse_button_pressed, bool &right_mouse_button_pressed, glm::vec2 prev_mouse_position)
+{
+	if (event.type == SDL_MOUSEMOTION)
+	{
+		int x = event.motion.xrel;
+		int y = event.motion.yrel;
+
+		renderer->CameraLook(glm::vec2(prev_mouse_position - glm::vec2(x, y)));
+		prev_mouse_position = glm::vec2(x, y);
+	}
+	else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
+	{
+		if (event.button.button == SDL_BUTTON_LEFT)
+		{
+			int x = event.button.x;
+			int y = event.button.y;
+			mouse_button_pressed = (event.type == SDL_MOUSEBUTTONDOWN);
+			prev_mouse_position = glm::vec2(x, y);
+		}
+		else if (event.button.button == SDL_BUTTON_RIGHT)
+		{
+			int x = event.button.x;
+			int y = event.button.y;
+			right_mouse_button_pressed = (event.type == SDL_MOUSEBUTTONDOWN);
+		}
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	//Initialize SDL, glew, engine
@@ -113,74 +191,6 @@ int main(int argc, char* argv[])
 			{
 				quit = true;
 			}
-			else if (event.type == SDL_KEYDOWN)
-			{
-				// Key down events
-				if (event.key.keysym.sym == SDLK_ESCAPE) quit = true;
-				else if (event.key.keysym.sym == SDLK_r) renderer->ReloadShaders();
-				else if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP)
-				{
-					renderer->CameraMoveForward(true);
-				}
-				else if (event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN)
-				{
-					renderer->CameraMoveBackWard(true);
-				}
-				else if (event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_LEFT)
-				{
-					renderer->CameraMoveLeft(true);
-				}
-				else if (event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_RIGHT)
-				{
-					renderer->CameraMoveRight(true);
-				}
-			}
-			else if (event.type == SDL_KEYUP)
-			{
-				// Key up events
-				if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP)
-				{
-					renderer->CameraMoveForward(false);
-				}
-				else if (event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN)
-				{
-					renderer->CameraMoveBackWard(false);
-				}
-				else if (event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_LEFT)
-				{
-					renderer->CameraMoveLeft(false);
-				}
-				else if (event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_RIGHT)
-				{
-					renderer->CameraMoveRight(false);
-				}
-			}
-			else if (event.type == SDL_MOUSEMOTION)
-			{
-				int x = event.motion.x;
-				int y = event.motion.y;
-				if (mouse_button_pressed)
-				{
-					renderer->CameraLook(prev_mouse_position - glm::vec2(x, y));
-					prev_mouse_position = glm::vec2(x, y);
-				}				
-			}
-			else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
-			{
-				if (event.button.button == SDL_BUTTON_LEFT)
-				{
-					int x = event.button.x;
-					int y = event.button.y;
-					mouse_button_pressed = (event.type == SDL_MOUSEBUTTONDOWN);
-					prev_mouse_position = glm::vec2(x, y);
-				}
-				else if (event.button.button == SDL_BUTTON_RIGHT)
-				{
-					int x = event.button.x;
-					int y = event.button.y;
-					right_mouse_button_pressed = (event.type == SDL_MOUSEBUTTONDOWN);
-				}
-			}
 			else if (event.type == SDL_WINDOWEVENT)
 			{
 				if (event.window.event == SDL_WINDOWEVENT_RESIZED)
@@ -188,13 +198,16 @@ int main(int argc, char* argv[])
 					renderer->ResizeBuffers(event.window.data1, event.window.data2);
 				}
 			}
+			keyboardInput(quit);
+			mouseInput(mouse_button_pressed, right_mouse_button_pressed, prev_mouse_position);
 		}
+
+		//SDL_WarpMouseInWindow(window, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); might be unnecessary
 
 		// Compute the ellapsed time
 		auto simulation_end = chrono::steady_clock::now();
 
-		float dt = chrono::duration <float>(
-			simulation_end - simulation_start).count(); // in seconds
+		float dt = chrono::duration <float>(simulation_end - simulation_start).count(); // in seconds
 
 		simulation_start = chrono::steady_clock::now();
 

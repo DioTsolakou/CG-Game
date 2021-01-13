@@ -26,6 +26,10 @@ protected:
 	glm::vec2										m_camera_look_angle_destination;
 	
 	float m_continous_time;
+	float FOV;
+	float aspectRatio;
+	float nearPlane;
+	float farPlane;
 
 	// Protected Functions
 	bool InitShaders();
@@ -40,6 +44,8 @@ protected:
 	void RenderCollidableGeometry();
 	void RenderShadowMaps();
 	void RenderPostProcess();
+	void crosshair();
+	void drawCrosshair();
 
 	enum MAP_ASSETS
 	{
