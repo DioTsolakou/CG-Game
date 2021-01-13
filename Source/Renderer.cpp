@@ -90,10 +90,10 @@ void Renderer::InitCamera()
 
 bool Renderer::InitLights()
 {
-	this->m_light.SetColor(glm::vec3(40.f));
-	this->m_light.SetPosition(glm::vec3(0, 3, 5));
-	this->m_light.SetTarget(glm::vec3(0));
-	this->m_light.SetConeSize(200, 200);
+	this->m_light.SetColor(glm::vec3(255.f, 241.f, 224.f));
+	this->m_light.SetPosition(this->m_camera_position);
+	this->m_light.SetTarget(this->m_camera_target_position);
+	this->m_light.SetConeSize(500, 1000);
 	this->m_light.CastShadow(false);
 
 	return true;
@@ -376,8 +376,8 @@ void Renderer::UpdateCamera(float dt)
 
 	//std::cout << m_camera_position.x << " " << m_camera_position.y << " " << m_camera_position.z << " " << std::endl;
 	//std::cout << m_camera_target_position.x << " " << m_camera_target_position.y << " " << m_camera_target_position.z << " " << std::endl;
-	//m_light.SetPosition(m_camera_position);
-	//m_light.SetTarget(m_camera_target_position);
+	m_light.SetPosition(m_camera_position);
+	m_light.SetTarget(m_camera_target_position);
 }
 
 bool Renderer::ReloadShaders()
@@ -606,9 +606,9 @@ void Renderer::RenderShadowMaps()
 	}
 }
 
-void Renderer::CameraMoveForward(bool enable)
+void Renderer::CameraMoveForward(bool enable, float &factor)
 {
-	m_camera_movement.x = (enable) ? 1 : 0;
+	m_camera_movement.x = (enable) ? 1*factor : 0;
 }
 void Renderer::CameraMoveBackWard(bool enable)
 {

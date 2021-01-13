@@ -90,7 +90,7 @@ void LightNode::SetConeSize(float umbra, float penumbra)
 	m_penumbra = penumbra;
 
 	float near_clipping_range = 0.1f;
-	float far_clipping_range = 10.f;
+	float far_clipping_range = 200.f;
 	
 	float h = near_clipping_range * glm::tan(glm::radians(m_penumbra * 0.5f));
 	m_projection_matrix = glm::frustum(-h, h, -h, h, near_clipping_range, far_clipping_range);

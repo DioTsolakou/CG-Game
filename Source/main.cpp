@@ -92,14 +92,15 @@ bool init()
 	return engine_initialized;
 }
 
-void keyboardInput(bool &quit)
+void keyboardInput(bool &quit, float &movement_factor)
 {
 	if (event.type == SDL_KEYDOWN)
 	{
 		if (event.key.keysym.sym == SDLK_ESCAPE) quit = true;
+		if (event.key.keysym.sym == SDLK_LSHIFT) movement_factor = 5.f;
 		if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP)
 		{
-			renderer->CameraMoveForward(true);
+			renderer->CameraMoveForward(true, movement_factor);
 		}
 		else if (event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN)
 		{
@@ -117,9 +118,10 @@ void keyboardInput(bool &quit)
 	}
 	else if (event.type == SDL_KEYUP)
 	{
+		if (event.key.keysym.sym == SDLK_LSHIFT) movement_factor = 1.f;
 		if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP)
 		{
-			renderer->CameraMoveForward(false);
+			renderer->CameraMoveForward(false, movement_factor);
 		}
 		else if (event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN)
 		{
@@ -150,6 +152,8 @@ void mouseInput(bool &mouse_button_pressed, bool &right_mouse_button_pressed, gl
 	{
 		if (event.button.button == SDL_BUTTON_LEFT)
 		{
+			// to do : call function to shoot
+
 			int x = event.button.x;
 			int y = event.button.y;
 			mouse_button_pressed = (event.type == SDL_MOUSEBUTTONDOWN);
@@ -178,6 +182,7 @@ int main(int argc, char* argv[])
 	bool mouse_button_pressed = false;
 	bool right_mouse_button_pressed = false;
 	glm::vec2 prev_mouse_position(0);
+	float movement_factor = 1.f;
 
 	auto simulation_start = chrono::steady_clock::now();
 
@@ -198,7 +203,7 @@ int main(int argc, char* argv[])
 					renderer->ResizeBuffers(event.window.data1, event.window.data2);
 				}
 			}
-			keyboardInput(quit);
+			keyboardInput(quit, movement_factor);
 			mouseInput(mouse_button_pressed, right_mouse_button_pressed, prev_mouse_position);
 		}
 
