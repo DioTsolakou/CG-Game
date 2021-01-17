@@ -63,10 +63,25 @@ void Renderer::BuildWorld()
 	//beam.model_matrix = glm::rotate(glm::mat4(1.f), glm::radians(45.f), glm::vec3(0.f, 0.f, 1.f));
 	//beam.m_aabb.center = glm::vec3(beam.model_matrix * glm::vec4(beam.m_aabb.center, 1.f));
 
-	beam.model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(5.f, 0.f, 0.f));
+	/*beam.model_matrix = glm::rotate(glm::mat4(1.f), glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f));
+	beam.m_aabb.center = glm::vec3(beam.model_matrix * glm::vec4(beam.m_aabb.center, 1.f));*/
+
+	
+	beam.model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(0.5f, 0.5f, 0.f));
+	beam.model_matrix = glm::rotate(beam.model_matrix, glm::radians(60.f), glm::vec3(0.f, 1.f, 0.f));
 	beam.m_aabb.center = glm::vec3(beam.model_matrix * glm::vec4(beam.m_aabb.center, 1.f));
 
-	cannon.model_matrix = glm::mat4(1.f);
+	glm::mat4 R = glm::rotate(glm::mat4(1.f), glm::radians(-60.f), glm::vec3(0.f, 1.f, 0.f));
+
+	cannon.model_matrix = 
+		glm::translate(glm::mat4(1.f), glm::vec3(cannon.m_aabb.center.x, cannon.m_aabb.center.y, cannon.m_aabb.center.z)) *
+		R *
+		glm::translate(glm::mat4(1.f), glm::vec3(-cannon.m_aabb.center.x, -cannon.m_aabb.center.y, -cannon.m_aabb.center.z));
+
+
+	//cannon.m_aabb.center = glm::vec3(cannon.model_matrix * glm::vec4(cannon.m_aabb.center, 1.f));
+
+
 	cannon_mount.model_matrix = glm::mat4(1.f);
 
 	this->m_world_matrix = glm::mat4(1.f);
@@ -90,7 +105,7 @@ void Renderer::InitCamera()
 
 bool Renderer::InitLights()
 {
-	this->m_light.SetColor(glm::vec3(255.f, 241.f, 224.f));
+	this->m_light.SetColor(glm::vec3(70.f));
 	this->m_light.SetPosition(this->m_camera_position);
 	this->m_light.SetTarget(this->m_camera_target_position);
 	this->m_light.SetConeSize(500, 1000);
@@ -205,27 +220,27 @@ bool Renderer::InitGeometricMeshes()
 		"Assets/Cannon/CannonMount.obj",
 		//"Assets/Cannon/CH-CannonMount.obj",
 
-		"Assets/Corridor/Corridor_Curve.obj",
+		//"Assets/Corridor/Corridor_Curve.obj",
 
-		"Assets/Corridor/Corridor_Fork.obj",
+		//"Assets/Corridor/Corridor_Fork.obj",
 		//"Assets/Corridor/CH-Corridor_Fork.obj",
 
 		"Assets/Corridor/Corridor_Straight.obj",
 		//"Assets/Corridor/CH-Corridor_Straight.obj",
 
-		"Assets/Corridor/Corridor_Left.obj",
+		//"Assets/Corridor/Corridor_Left.obj",
 		//"Assets/Corridor/CH-Corridor_Left.obj",
 
-		"Assets/Corridor/Corridor_Right.obj",
+		//"Assets/Corridor/Corridor_Right.obj",
 		//"Assets/Corridor/CH-Corridor_Right.obj",
 		
-		"Assets/Iris/Iris.obj",
+		//"Assets/Iris/Iris.obj",
 		//"Assets/Iris/CH-Iris.obj",
 
-		"Assets/Pipe/Pipe.obj",
+		//"Assets/Pipe/Pipe.obj",
 		//"Assets/Pipe/CH-Pipe.obj",
 
-		"Assets/Wall/Wall.obj",
+		//"Assets/Wall/Wall.obj",
 		//"Assets/Wall/CH-Wall.obj",
 	};
 
@@ -269,63 +284,6 @@ void Renderer::Update(float dt)
 	m_continous_time += dt;
 }
 
-void Renderer::drawCrosshair()
-{
-	glPushMatrix();
-	glViewport(0, 0, this->m_screen_width, this->m_screen_height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, this->m_screen_width, this->m_screen_height, 0, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glColor3ub(240, 240, 240);//white
-	glLineWidth(2.0);
-
-	int crossHair[8] =
-	{
-	this->m_screen_width / 2 - 7, this->m_screen_height / 2, // horizontal line
-	this->m_screen_width / 2 + 7, this->m_screen_height / 2,
-
-	this->m_screen_width / 2, this->m_screen_height / 2 + 7, //vertical line
-	this->m_screen_width / 2, this->m_screen_height / 2 - 7
-	};
-
-	// activate vertex array state and assign pointer to vertext array data
-	glEnableClientState(GL_VERTEX_ARRAY);
-
-	glVertexPointer(2, GL_INT, 0, crossHair);
-
-	//draw primitive GL_LINES starting at the first vertex, use 2 total vertices
-	glDrawArrays(GL_LINES, 0, 2); //draw horizontal line
-	//Same as above but start at second vertex
-	glDrawArrays(GL_LINES, 2, 2); //draw vertical line
-
-	// deactivate vertex array state after drawing
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glPopMatrix();
-}
-
-//void Renderer::crosshair()
-//{
-//	glMatrixMode(GL_PROJECTION);
-//	glLoadIdentity();
-//	gluPerspective(this->FOV, this->aspectRatio, this->nearPlane, this->farPlane);
-//
-//	glMatrixMode(GL_MODELVIEW);
-//	glLoadIdentity();
-//
-//	glMatrixMode(GL_PROJECTION);
-//	glLoadIdentity();
-//
-//	glOrtho(0.f, this->m_screen_width, this->m_screen_height, 0.f, 0.f, 1.f);
-//	
-//	glMatrixMode(GL_MODELVIEW);
-//	glLoadIdentity();
-//
-//	drawCrosshair();
-//}
-
 void Renderer::UpdateGeometry(float dt)
 {
 	/*GeometryNode& bunny = *this->m_nodes[OBJECS::BUNNY];
@@ -363,6 +321,9 @@ void Renderer::UpdateCamera(float dt)
 
 	m_camera_position = m_camera_position + (m_camera_movement.y * 5.f * dt) * right;
 	m_camera_target_position = m_camera_target_position + (m_camera_movement.y * 5.f * dt) * right;
+
+	m_camera_position = m_camera_position + (m_camera_movement.z * 5.f * dt) * direction;
+	m_camera_target_position = m_camera_target_position + (m_camera_movement.z * 5.f * dt) * direction;
 
 	float speed = glm::pi<float>() * 0.002;
 	glm::mat4 rotation = glm::rotate(glm::mat4(1.f), m_camera_look_angle_destination.y * speed, right);
@@ -525,6 +486,26 @@ void Renderer::RenderGeometry()
 
 	glm::mat4 proj = m_projection_matrix * m_view_matrix * m_world_matrix;
 
+	for (auto& node : this->m_nodes)
+	{
+		glBindVertexArray(node->m_vao);
+
+		glUniformMatrix4fv(m_geometry_program["uniform_projection_matrix"], 1, GL_FALSE,
+			glm::value_ptr(proj * node->app_model_matrix));
+
+		glm::mat4 normal_matrix = glm::transpose(glm::inverse(m_world_matrix * node->app_model_matrix));
+
+		glUniformMatrix4fv(m_geometry_program["uniform_normal_matrix"], 1, GL_FALSE,
+			glm::value_ptr(normal_matrix));
+
+		for (int j = 0; j < node->parts.size(); ++j)
+		{
+			glDrawArrays(GL_TRIANGLES, node->parts[j].start_offset, node->parts[j].count);
+		}
+
+		glBindVertexArray(0);
+	}
+
 	m_geometry_program.loadVec3("uniform_light_color", m_light.GetColor());
 	m_geometry_program.loadVec3("uniform_light_dir", m_light.GetDirection());
 	m_geometry_program.loadVec3("uniform_light_pos", m_light.GetPosition());
@@ -610,6 +591,7 @@ void Renderer::CameraMoveForward(bool enable, float &factor)
 {
 	m_camera_movement.x = (enable) ? 1*factor : 0;
 }
+
 void Renderer::CameraMoveBackWard(bool enable)
 {
 	m_camera_movement.x = (enable) ? -1 : 0;
@@ -619,6 +601,7 @@ void Renderer::CameraMoveLeft(bool enable)
 {
 	m_camera_movement.y = (enable) ? -1 : 0;
 }
+
 void Renderer::CameraMoveRight(bool enable)
 {
 	m_camera_movement.y = (enable) ? 1 : 0;
@@ -627,4 +610,16 @@ void Renderer::CameraMoveRight(bool enable)
 void Renderer::CameraLook(glm::vec2 lookDir)
 {
 	m_camera_look_angle_destination = lookDir * glm::vec2(1.5f, 1.5f);
+}
+
+void Renderer::CameraRollLeft(bool enable)
+{
+	glm::mat4 roll_mat = glm::rotate(glm::mat4(1.0f), glm::radians(5.f), m_camera_target_position);
+	m_camera_up_vector = glm::mat3(roll_mat) * m_camera_up_vector;
+}
+
+void Renderer::CameraRollRight(bool enable)
+{
+	glm::mat4 roll_mat = glm::rotate(glm::mat4(1.0f), glm::radians(-5.f), m_camera_target_position);
+	m_camera_up_vector = glm::mat3(roll_mat) * m_camera_up_vector;
 }

@@ -29,7 +29,9 @@ void main(void)
 	ivec2 halfRes = ivec2(textureSize(uniform_texture, 0) / 2);
 	ivec2 pixel = ivec2(gl_FragCoord.xy);
 
-	if((pixel.x == halfRes.x) || (pixel.y == halfRes.y))
+	if(((pixel.x == halfRes.x) || (pixel.y == halfRes.y)) && 
+	((pixel.x < halfRes.x + 15) && (pixel.y < halfRes.y + 15)) && 
+	((pixel.x > halfRes.x - 15) && (pixel.y > halfRes.y - 15)))
 	{
 		out_color = vec4(1.0, 1.0, 1.0, 1.0);
 	}

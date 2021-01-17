@@ -22,7 +22,7 @@ protected:
 	glm::vec3										m_camera_position;
 	glm::vec3										m_camera_target_position;
 	glm::vec3										m_camera_up_vector;
-	glm::vec2										m_camera_movement;
+	glm::vec3										m_camera_movement;
 	glm::vec2										m_camera_look_angle_destination;
 	
 	float m_continous_time;
@@ -44,8 +44,6 @@ protected:
 	void RenderCollidableGeometry();
 	void RenderShadowMaps();
 	void RenderPostProcess();
-	void crosshair();
-	void drawCrosshair();
 
 	enum MAP_ASSETS
 	{
@@ -55,20 +53,20 @@ protected:
 		//CH_CANNON,
 		CANNON_MOUNT,
 		//CH_CANNON_MOUNT,
-		CORRIDOR_CURVE,
-		CORRIDOR_FORK,
+		//CORRIDOR_CURVE,
+		//CORRIDOR_FORK,
 		//CH_CORRIDOR_FORK,
 		CORRIDOR_STRAIGHT,
 		//CH_CORRIDOR_STRAIGHT,
-		CORRIDOR_LEFT,
+		//CORRIDOR_LEFT,
 		//CH_CORRIDOR_LEFT,
-		CORRIDOR_RIGHT,
+		//CORRIDOR_RIGHT,
 		//CH_CORRIDOR_RIGHT,
-		IRIS,
+		//IRIS,
 		//CH_IRIS,
-		PIPE,
+		//PIPE,
 		//CH_PIPE,
-		WALL,
+		//WALL,
 		//CH_WALL,
 		SIZE_ALL
 	};
@@ -104,6 +102,8 @@ public:
 	void										CameraMoveLeft(bool enable);
 	void										CameraMoveRight(bool enable);
 	void										CameraLook(glm::vec2 lookDir);
+	void										CameraRollLeft(bool enable);
+	void										CameraRollRight(bool enable);
 };
 
 #endif

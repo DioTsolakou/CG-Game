@@ -114,6 +114,14 @@ void keyboardInput(bool &quit, float &movement_factor)
 		{
 			renderer->CameraMoveRight(true);
 		}
+		else if (event.key.keysym.sym == SDLK_q)
+		{
+			renderer->CameraRollLeft(true);
+		}
+		else if (event.key.keysym.sym == SDLK_e)
+		{
+			renderer->CameraRollRight(true);
+		}
 		else if (event.key.keysym.sym == SDLK_r) renderer->ReloadShaders();
 	}
 	else if (event.type == SDL_KEYUP)
@@ -134,6 +142,14 @@ void keyboardInput(bool &quit, float &movement_factor)
 		else if (event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_RIGHT)
 		{
 			renderer->CameraMoveRight(false);
+		}
+		else if (event.key.keysym.sym == SDLK_q)
+		{
+			renderer->CameraRollLeft(false);
+		}
+		else if (event.key.keysym.sym == SDLK_e)
+		{
+			renderer->CameraRollRight(false);
 		}
 	}
 }
