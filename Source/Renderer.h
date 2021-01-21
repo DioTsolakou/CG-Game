@@ -24,6 +24,16 @@ protected:
 	glm::vec3										m_camera_up_vector;
 	glm::vec3										m_camera_movement;
 	glm::vec2										m_camera_look_angle_destination;
+
+	std::vector<CollidableNode*> pipes; //3 pipes
+	std::vector<CollidableNode*> beamArray[6]; //6 beams
+	std::vector<CollidableNode*> corridorStraightArray[41]; //41 corridorStraight
+	std::vector<CollidableNode*> corridorLeftArray[14]; //14 corridorLeft
+	std::vector<CollidableNode*> corridorRightArray[5]; //5 corridorRight
+	std::vector<CollidableNode*> corridorForkArray[4]; //4 corridorFork
+	std::vector<CollidableNode*> corridorCurveArray[18]; //18 corridorCurve
+	//CollidableNode cannonArray[];
+	//CollidableNode cannonMountArray[];
 	
 	float m_continous_time;
 	float FOV;
@@ -47,16 +57,16 @@ protected:
 
 	enum MAP_ASSETS
 	{
-		BEAM = 0,
+		//BEAM = 0,
 		//CH_BEAM,
-		CANNON,
+		//CANNON,
 		//CH_CANNON,
-		CANNON_MOUNT,
+		//CANNON_MOUNT,
 		//CH_CANNON_MOUNT,
 		//CORRIDOR_CURVE,
 		//CORRIDOR_FORK,
 		//CH_CORRIDOR_FORK,
-		CORRIDOR_STRAIGHT,
+		//CORRIDOR_STRAIGHT,
 		//CH_CORRIDOR_STRAIGHT,
 		//CORRIDOR_LEFT,
 		//CH_CORRIDOR_LEFT,
@@ -64,7 +74,7 @@ protected:
 		//CH_CORRIDOR_RIGHT,
 		//IRIS,
 		//CH_IRIS,
-		//PIPE,
+		PIPE = 0,
 		//CH_PIPE,
 		//WALL,
 		//CH_WALL,
@@ -104,6 +114,8 @@ public:
 	void										CameraLook(glm::vec2 lookDir);
 	void										CameraRollLeft(bool enable);
 	void										CameraRollRight(bool enable);
+	glm::mat4									rotate(CollidableNode& object, float angleX, float angleY, float angleZ);
+	glm::mat4									move(CollidableNode& object, float moveX, float moveY, float moveZ);
 };
 
 #endif

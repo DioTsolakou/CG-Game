@@ -56,19 +56,14 @@ bool Renderer::Init(int SCREEN_WIDTH, int SCREEN_HEIGHT)
 
 void Renderer::BuildWorld()
 {
-	GeometryNode& beam = *this->m_nodes[MAP_ASSETS::BEAM];
+	/*GeometryNode& beam = *this->m_nodes[MAP_ASSETS::BEAM];
 	GeometryNode& cannon = *this->m_nodes[MAP_ASSETS::CANNON];
-	GeometryNode& cannon_mount = *this->m_nodes[MAP_ASSETS::CANNON_MOUNT];
+	GeometryNode& cannon_mount = *this->m_nodes[MAP_ASSETS::CANNON_MOUNT];*/
 
-	//beam.model_matrix = glm::rotate(glm::mat4(1.f), glm::radians(45.f), glm::vec3(0.f, 0.f, 1.f));
-	//beam.m_aabb.center = glm::vec3(beam.model_matrix * glm::vec4(beam.m_aabb.center, 1.f));
 
-	/*beam.model_matrix = glm::rotate(glm::mat4(1.f), glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f));
-	beam.m_aabb.center = glm::vec3(beam.model_matrix * glm::vec4(beam.m_aabb.center, 1.f));*/
-
+	//CollidableNode& corridor_straight = *this->m_collidables_nodes[0];
 	
-	beam.model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(0.5f, 0.5f, 0.f));
-	beam.model_matrix = glm::rotate(beam.model_matrix, glm::radians(60.f), glm::vec3(0.f, 1.f, 0.f));
+	/*beam.model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 5.f, 0.f));
 	beam.m_aabb.center = glm::vec3(beam.model_matrix * glm::vec4(beam.m_aabb.center, 1.f));
 
 	glm::mat4 R = glm::rotate(glm::mat4(1.f), glm::radians(-60.f), glm::vec3(0.f, 1.f, 0.f));
@@ -79,10 +74,22 @@ void Renderer::BuildWorld()
 		glm::translate(glm::mat4(1.f), glm::vec3(-cannon.m_aabb.center.x, -cannon.m_aabb.center.y, -cannon.m_aabb.center.z));
 
 
-	//cannon.m_aabb.center = glm::vec3(cannon.model_matrix * glm::vec4(cannon.m_aabb.center, 1.f));
+	cannon.m_aabb.center = glm::vec3(cannon.model_matrix * glm::vec4(cannon.m_aabb.center, 1.f));
 
+	cannon_mount.model_matrix = glm::mat4(1.f);*/
 
-	cannon_mount.model_matrix = glm::mat4(1.f);
+	CollidableNode& pipe0 = *this->m_collidables_nodes[0];
+	CollidableNode& pipe1 = *this->m_collidables_nodes[1];
+	CollidableNode& pipe2 = *this->m_collidables_nodes[2];
+
+	pipe0.model_matrix = rotate(pipe0, 181.25f, 173.8f, 90.74f);
+	pipe0.m_aabb.center = glm::vec3(pipe0.model_matrix * glm::vec4(pipe0.m_aabb.center, 1.f));
+
+	pipe1.model_matrix = move(pipe1, 0.f, 5.f, 0.f) * rotate(pipe1, 90.f, 0.f, 0.f);
+	pipe1.m_aabb.center = glm::vec3(pipe1.model_matrix * glm::vec4(pipe1.m_aabb.center, 1.f));
+
+	pipe2.model_matrix = move(pipe2, 5.f, 0.f, 0.f);
+	pipe2.m_aabb.center = glm::vec3(pipe2.model_matrix * glm::vec4(pipe2.m_aabb.center, 1.f));
 
 	this->m_world_matrix = glm::mat4(1.f);
 }
@@ -211,13 +218,13 @@ bool Renderer::InitCommonItems()
 bool Renderer::InitGeometricMeshes()
 {
 	std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets = {
-		"Assets/Beam/Beam.obj",
+		//"Assets/Beam/Beam.obj",
 		//"Assets/Beam/CH-Beam.obj",
 
-		"Assets/Cannon/Cannon.obj",
+		//"Assets/Cannon/Cannon.obj",
 		//"Assets/Cannon/CH-Cannon.obj",
 
-		"Assets/Cannon/CannonMount.obj",
+		//"Assets/Cannon/CannonMount.obj",
 		//"Assets/Cannon/CH-CannonMount.obj",
 
 		//"Assets/Corridor/Corridor_Curve.obj",
@@ -225,7 +232,7 @@ bool Renderer::InitGeometricMeshes()
 		//"Assets/Corridor/Corridor_Fork.obj",
 		//"Assets/Corridor/CH-Corridor_Fork.obj",
 
-		"Assets/Corridor/Corridor_Straight.obj",
+		//"Assets/Corridor/Corridor_Straight.obj",
 		//"Assets/Corridor/CH-Corridor_Straight.obj",
 
 		//"Assets/Corridor/Corridor_Left.obj",
@@ -237,7 +244,7 @@ bool Renderer::InitGeometricMeshes()
 		//"Assets/Iris/Iris.obj",
 		//"Assets/Iris/CH-Iris.obj",
 
-		//"Assets/Pipe/Pipe.obj",
+		"Assets/Pipe/Pipe.obj",
 		//"Assets/Pipe/CH-Pipe.obj",
 
 		//"Assets/Wall/Wall.obj",
@@ -247,8 +254,9 @@ bool Renderer::InitGeometricMeshes()
 	bool initialized = true;
 	OBJLoader loader;
 
-	for (auto & asset : mapAssets)
+	/*for (int32_t i = 0; i < MAP_ASSETS::SIZE_ALL - 1; ++i)
 	{
+		auto& asset = mapAssets[i];
 		GeometricMesh* mesh = loader.load(asset);
 
 		if (mesh != nullptr)
@@ -262,16 +270,19 @@ bool Renderer::InitGeometricMeshes()
 		{
 			initialized = false;
 		}
-	}
+	}*/
 
-	GeometricMesh* mesh = loader.load(mapAssets[1]);
-
-	if (mesh != nullptr)
+	for (int i = 0; i < 3; i++)
 	{
-		CollidableNode* node = new CollidableNode();
-		node->Init(mesh);
-		this->m_collidables_nodes.push_back(node);
-		delete mesh;
+		GeometricMesh* mesh = loader.load(mapAssets[PIPE]);
+
+		if (mesh != nullptr)
+		{
+			CollidableNode* node = new CollidableNode();
+			node->Init(mesh);
+			this->m_collidables_nodes.push_back(node);
+			delete mesh;
+		}
 	}
 
 	return initialized;
@@ -286,28 +297,23 @@ void Renderer::Update(float dt)
 
 void Renderer::UpdateGeometry(float dt)
 {
-	/*GeometryNode& bunny = *this->m_nodes[OBJECS::BUNNY];
-	GeometryNode& ball = *this->m_nodes[OBJECS::BALL];
-	GeometryNode& chair = *this->m_nodes[OBJECS::CHAIR];
-	GeometryNode& floor = *this->m_nodes[OBJECS::FLOOR];
-	GeometryNode& beam = *this->m_nodes[OBJECS::BEAM];*/
+	/*GeometryNode& beam = *this->m_nodes[MAP_ASSETS::BEAM];
+	GeometryNode& cannon = *this->m_nodes[MAP_ASSETS::CANNON];
+	GeometryNode& cannon_mount = *this->m_nodes[MAP_ASSETS::CANNON_MOUNT];
+	CollidableNode& corridor_straight = *this->m_collidables_nodes[0];*/
 
-	GeometryNode& beam = *this->m_nodes[MAP_ASSETS::BEAM];
+	/*beam.app_model_matrix = beam.model_matrix;
+	cannon.app_model_matrix = cannon.model_matrix;
+	cannon_mount.app_model_matrix = cannon_mount.model_matrix;
+	corridor_straight.app_model_matrix = corridor_straight.model_matrix;*/
 
-	/*bunny.app_model_matrix =
-		glm::translate(glm::mat4(1.f), bunny.m_aabb.center) *
-		glm::rotate(glm::mat4(1.f), m_continous_time, glm::vec3(0.f, 1.f, 0.f)) *
-		glm::translate(glm::mat4(1.f), -bunny.m_aabb.center) *
-		bunny.model_matrix;
+	CollidableNode& pipe0 = *this->m_collidables_nodes[0];
+	CollidableNode& pipe1 = *this->m_collidables_nodes[1];
+	CollidableNode& pipe2 = *this->m_collidables_nodes[2];
 
-	ball.app_model_matrix =
-		glm::translate(glm::mat4(1.f), ball.m_aabb.center) *
-		glm::rotate(glm::mat4(1.f), m_continous_time, glm::vec3(.5f, .5f, 0.f)) *
-		glm::translate(glm::mat4(1.f), -ball.m_aabb.center) *
-		ball.model_matrix;*/
-
-	beam.app_model_matrix = glm::translate(glm::mat4(1.f), beam.m_aabb.center*glm::vec3(10.f));
-	beam.model_matrix;
+	pipe0.app_model_matrix = pipe0.model_matrix;
+	pipe1.app_model_matrix = pipe1.model_matrix;
+	pipe2.app_model_matrix = pipe2.model_matrix;
 }
 
 void Renderer::UpdateCamera(float dt)
@@ -622,4 +628,27 @@ void Renderer::CameraRollRight(bool enable)
 {
 	glm::mat4 roll_mat = glm::rotate(glm::mat4(1.0f), glm::radians(-5.f), m_camera_target_position);
 	m_camera_up_vector = glm::mat3(roll_mat) * m_camera_up_vector;
+}
+
+glm::mat4 Renderer::rotate(CollidableNode& object, float angleX, float angleY, float angleZ)
+{
+	glm::mat4 rotationX;
+	glm::mat4 rotationY;
+	glm::mat4 rotationZ;
+
+	rotationX = glm::rotate(glm::mat4(1.f), glm::radians(angleX), glm::vec3(1.f, 0.f, 0.f));
+	rotationY = glm::rotate(glm::mat4(1.f), glm::radians(angleY), glm::vec3(0.f, 1.f, 0.f));
+	rotationZ = glm::rotate(glm::mat4(1.f), glm::radians(angleZ), glm::vec3(0.f, 0.f, 1.f));
+
+	object.model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(object.m_aabb.center.x, object.m_aabb.center.y, object.m_aabb.center.z)) *
+		(rotationZ * rotationY * rotationX) *
+		glm::translate(glm::mat4(1.f), glm::vec3(-object.m_aabb.center.x, -object.m_aabb.center.y, -object.m_aabb.center.z));
+
+	return object.model_matrix;
+}
+
+glm::mat4 Renderer::move(CollidableNode& object, float moveX, float moveY, float moveZ)
+{
+	object.model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(moveX, moveY, moveZ));
+	return object.model_matrix;
 }
