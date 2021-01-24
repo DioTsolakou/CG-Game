@@ -5,6 +5,8 @@
 #include "Renderer.h"
 #include <thread>         // std::this_thread::sleep_for
 
+#define FPS_INTERVAL 1.0 //seconds.
+
 using namespace std;
 
 //Screen attributes
@@ -14,6 +16,9 @@ SDL_Window* window;
 SDL_GLContext gContext;
 const int SCREEN_WIDTH = 1920;
 const int SCREEN_HEIGHT = 1080;
+Uint32 fps_lasttime = SDL_GetTicks(); //the last recorded time.
+Uint32 fps_current; //the current FPS.
+Uint32 fps_frames = 0; //frames passed since the last recorded fps.
 
 //Event handler
 SDL_Event event;
@@ -50,7 +55,7 @@ bool init()
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	// Create Window
-	window = SDL_CreateWindow("OpenGL Lab 3",
+	window = SDL_CreateWindow("CG Game",
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 		SCREEN_WIDTH, SCREEN_HEIGHT,
 		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
@@ -222,6 +227,16 @@ int main(int argc, char* argv[])
 			keyboardInput(quit, movement_factor);
 			mouseInput(mouse_button_pressed, right_mouse_button_pressed, prev_mouse_position);
 		}
+
+		fps_frames++;
+		if (fps_lasttime < SDL_GetTicks() - FPS_INTERVAL * 1000)
+		{
+			fps_lasttime = SDL_GetTicks();
+			fps_current = fps_frames;
+			fps_frames = 0;
+		}
+
+		cout << fps_current << endl;
 
 		//SDL_WarpMouseInWindow(window, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); might be unnecessary
 

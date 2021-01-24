@@ -11,9 +11,6 @@
 
 class Renderer
 {
-public:
-	// Empty
-
 protected:
 	int												m_screen_width, m_screen_height;
 	glm::mat4										m_world_matrix;
@@ -26,12 +23,12 @@ protected:
 	glm::vec2										m_camera_look_angle_destination;
 
 	std::vector<CollidableNode*> pipes; //3 pipes
-	std::vector<CollidableNode*> beamArray[6]; //6 beams
-	std::vector<CollidableNode*> corridorStraightArray[41]; //41 corridorStraight
-	std::vector<CollidableNode*> corridorLeftArray[14]; //14 corridorLeft
-	std::vector<CollidableNode*> corridorRightArray[5]; //5 corridorRight
-	std::vector<CollidableNode*> corridorForkArray[4]; //4 corridorFork
-	std::vector<CollidableNode*> corridorCurveArray[18]; //18 corridorCurve
+	std::vector<CollidableNode*> beamArray; //6 beams
+	std::vector<CollidableNode*> corridorStraightArray; //41 corridorStraight
+	std::vector<CollidableNode*> corridorLeftArray; //14 corridorLeft
+	std::vector<CollidableNode*> corridorRightArray; //5 corridorRight
+	std::vector<CollidableNode*> corridorForkArray; //4 corridorFork
+	std::vector<CollidableNode*> corridorCurveArray; //18 corridorCurve
 	//CollidableNode cannonArray[];
 	//CollidableNode cannonMountArray[];
 	
@@ -54,29 +51,30 @@ protected:
 	void RenderCollidableGeometry();
 	void RenderShadowMaps();
 	void RenderPostProcess();
+	void createMap();
 
 	enum MAP_ASSETS
 	{
-		//BEAM = 0,
+		BEAM = 0,
 		//CH_BEAM,
 		//CANNON,
 		//CH_CANNON,
 		//CANNON_MOUNT,
 		//CH_CANNON_MOUNT,
-		//CORRIDOR_CURVE,
-		//CORRIDOR_FORK,
+		CORRIDOR_CURVE,
+		CORRIDOR_FORK,
 		//CH_CORRIDOR_FORK,
-		//CORRIDOR_STRAIGHT,
+		CORRIDOR_STRAIGHT,
 		//CH_CORRIDOR_STRAIGHT,
-		//CORRIDOR_LEFT,
+		CORRIDOR_LEFT,
 		//CH_CORRIDOR_LEFT,
-		//CORRIDOR_RIGHT,
+		CORRIDOR_RIGHT,
 		//CH_CORRIDOR_RIGHT,
 		//IRIS,
 		//CH_IRIS,
-		PIPE = 0,
+		PIPE,
 		//CH_PIPE,
-		//WALL,
+		WALL,
 		//CH_WALL,
 		SIZE_ALL
 	};
