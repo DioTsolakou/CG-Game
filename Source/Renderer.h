@@ -38,21 +38,6 @@ protected:
 	float nearPlane;
 	float farPlane;
 
-	// Protected Functions
-	bool InitShaders();
-	bool InitGeometricMeshes();
-	bool InitCommonItems();
-	bool InitLights();
-	bool InitIntermediateBuffers();
-	void BuildWorld();
-	void InitCamera();
-	void RenderGeometry();
-	void RenderStaticGeometry();
-	void RenderCollidableGeometry();
-	void RenderShadowMaps();
-	void RenderPostProcess();
-	void createMap();
-
 	enum MAP_ASSETS
 	{
 		BEAM = 0,
@@ -78,6 +63,22 @@ protected:
 		//CH_WALL,
 		SIZE_ALL
 	};
+
+	// Protected Functions
+	bool InitShaders();
+	bool InitGeometricMeshes();
+	bool InitCommonItems();
+	bool InitLights();
+	bool InitIntermediateBuffers();
+	void BuildWorld();
+	void InitCamera();
+	void RenderGeometry();
+	void RenderStaticGeometry();
+	void RenderCollidableGeometry();
+	void RenderShadowMaps();
+	void RenderPostProcess();
+	void createMap();
+	void buildMap(bool& init, std::array<const char*, MAP_ASSETS::SIZE_ALL>& map_assets, MAP_ASSETS asset, glm::vec3 move, glm::vec3 rotate, glm::vec3 scale = glm::vec3(1.f, 1.f, 1.f));
 
 	std::vector<GeometryNode*> m_nodes;
 	std::vector<CollidableNode*> m_collidables_nodes;
@@ -112,8 +113,9 @@ public:
 	void										CameraLook(glm::vec2 lookDir);
 	void										CameraRollLeft(bool enable);
 	void										CameraRollRight(bool enable);
-	glm::mat4									rotate(CollidableNode& object, float angleX, float angleY, float angleZ);
-	glm::mat4									move(CollidableNode& object, float moveX, float moveY, float moveZ);
+	glm::mat4									rotate(CollidableNode& object, glm::vec3 rotation);
+	glm::mat4									move(CollidableNode& object, glm::vec3 movement);
+	glm::mat4									scale(CollidableNode& object, glm::vec3 scale);
 };
 
 #endif
