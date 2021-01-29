@@ -51,7 +51,7 @@ GLuint TextureManager::RequestTexture(const char* filename, bool hasMipmaps)
 		printf("SDL load Error %s\n", SDL_GetError());
 		return 0; // error
 	}
-	
+
 	TextureContainer container;
 	container.filename = filename;
 	container.hasMipmaps = hasMipmaps;
@@ -64,19 +64,19 @@ GLuint TextureManager::RequestTexture(const char* filename, bool hasMipmaps)
 
 	switch (surf->format->BytesPerPixel)
 	{
-		case 3: // no alpha channel
-			if (surf->format->Rmask == 0x000000ff) texture_format = GL_RGB;
-			else texture_format = GL_BGR;
-			nOfColors = GL_RGB;
-			break;
-		case 4: // contains alpha channel
-			if (surf->format->Rmask == 0x000000ff)	 texture_format = GL_RGBA;
-			else texture_format = GL_BGRA;
-			nOfColors = GL_RGBA;
-			break;
+	case 3: // no alpha channel
+		if (surf->format->Rmask == 0x000000ff) texture_format = GL_RGB;
+		else texture_format = GL_BGR;
+		nOfColors = GL_RGB;
+		break;
+	case 4: // contains alpha channel
+		if (surf->format->Rmask == 0x000000ff)	 texture_format = GL_RGBA;
+		else texture_format = GL_BGRA;
+		nOfColors = GL_RGBA;
+		break;
 
-		default:
-			printf("Error in number of colors at %s\n", filename);
+	default:
+		printf("Error in number of colors at %s\n", filename);
 	}
 
 	unsigned char* data = new unsigned char[surf->w * surf->h * surf->format->BytesPerPixel];
@@ -87,7 +87,7 @@ GLuint TextureManager::RequestTexture(const char* filename, bool hasMipmaps)
 		memcpy(
 			&data[(surf->h - y - 1) * surf->w * surf->format->BytesPerPixel],
 			&static_cast<unsigned char*>(surf->pixels)[y * surf->w * surf->format->BytesPerPixel],
-			surf->w * surf->format->BytesPerPixel * sizeof(unsigned char));
+			surf->w* surf->format->BytesPerPixel * sizeof(unsigned char));
 	}
 
 	SDL_LockSurface(surf);

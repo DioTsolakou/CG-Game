@@ -16,7 +16,7 @@ class LightNode
 
 	float m_umbra;
 	float m_penumbra;
-	
+
 	bool m_cast_shadow;
 	int m_shadow_map_resolution;
 	float m_shadow_map_bias;
@@ -28,13 +28,13 @@ class LightNode
 	glm::mat4 m_view_matrix;
 	glm::mat4 m_view_inverse_matrix;
 
-public:	
+public:
 	LightNode();
 	~LightNode();
 
-	void SetPosition(const glm::vec3 & pos);
-	void SetColor(const glm::vec3 & color);
-	void SetTarget(const glm::vec3 & target);
+	void SetPosition(const glm::vec3& pos);
+	void SetColor(const glm::vec3& color);
+	void SetTarget(const glm::vec3& target);
 	void SetConeSize(float umbra, float penumbra);
 
 	glm::vec3 GetPosition();

@@ -94,5 +94,20 @@
     <None Include="Assets\Shaders\shadow_map_rendering.vert">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="Assets\Shaders\deferred pass.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Assets\Shaders\deferred pass.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Assets\Shaders\geometry pass.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Assets\Shaders\geometry pass.geom">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Assets\Shaders\geometry pass.vert">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

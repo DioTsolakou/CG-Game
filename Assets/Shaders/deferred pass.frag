@@ -2,24 +2,17 @@
 layout(location = 0) out vec4 out_color;
 
 in vec2 f_texcoord;
-in vec3 f_position_wcs;
-in mat3 f_TBN;
 
 #define _PI_ 3.14159
 
 uniform vec3 uniform_camera_pos;
 uniform vec3 uniform_camera_dir;
 
-uniform vec3 uniform_diffuse;
-uniform vec3 uniform_specular;
-uniform vec3 uniform_ambient;
-uniform float uniform_shininess;
-
-uniform int uniform_has_tex_diffuse;
-uniform int uniform_has_tex_normal;
-uniform int uniform_is_tex_bumb;
-uniform sampler2D uniform_tex_diffuse;
+uniform sampler2D uniform_tex_pos;
 uniform sampler2D uniform_tex_normal;
+uniform sampler2D uniform_tex_albedo;
+uniform sampler2D uniform_tex_mask;
+uniform sampler2D uniform_tex_depth;
 
 uniform vec3 uniform_light_color;
 uniform vec3 uniform_light_pos;
@@ -139,62 +132,132 @@ float shadow(vec3 pwcs)
 
 	// sample shadow map
 	//return shadow_nearest(plcs.xyz);
-	return shadow_pcf2x2_weighted(plcs.xyz);
-	//return shadow_pcf2x2_mean(plcs.xyz);
+	//return shadow_pcf2x2_weighted(plcs.xyz);
+	return shadow_pcf2x2_mean(plcs.xyz);
 }
 
-vec3 blinn_phong(const in vec3 pSurfToEye, const in vec3 pSurfToLight)
+vec3 blinn_phong(
+	const in vec3 pSurfToEye,
+	const in vec3 pSurfToLight,
+	const in vec3 pPos,
+	const in vec3 pNormal,
+	const in vec3 pAlbedo,
+	const in vec4 pMask,
+	const in vec3 pEmission)
 {
-	vec3 normal = f_TBN[2];
-
-	if(uniform_has_tex_normal == 1)
-	{
-		vec3 nmap = texture(uniform_tex_normal, f_texcoord).rgb;
-
-		if(uniform_is_tex_bumb == 1)
-		{
-			float heigh_prev_U = textureOffset(uniform_tex_normal, f_texcoord, ivec2(-1, 0)).r;
-			float heigh_prev_V = textureOffset(uniform_tex_normal, f_texcoord, ivec2(0, -1)).r;
-			normal = normal - f_TBN[0] * (nmap.r - heigh_prev_U) - f_TBN[1] * (nmap.r - heigh_prev_V);
-		}
-		else
-		{
-			nmap = nmap * 2.0 - 1.0;
-			normal = normalize(f_TBN * nmap);
-		}
-	}
-
 	vec3 halfVector = normalize(pSurfToEye + pSurfToLight);
 
-	float NdotL = max(dot(normal, pSurfToLight), 0.0);
-	float NdotH = max(dot(normal, halfVector), 0.0);
+	float NdotL = max(dot(pNormal, pSurfToLight), 0.0);
+	float NdotH = max(dot(pNormal, halfVector), 0.0);
 
-	vec3 albedo = uniform_has_tex_diffuse == 1 ? texture(uniform_tex_diffuse, f_texcoord).rgb : uniform_diffuse;
-
-	vec3 kd = albedo / _PI_;
-	vec3 ks = uniform_specular;
+	vec3 kd = pAlbedo / _PI_;
+	float metallic = pMask.r;
+	float ao = pMask.g;
+	vec3 ks = vec3(pMask.b);
+	float alpha = pMask.a * 127.0;
 
 	float fn =
-		((uniform_shininess + 2) * (uniform_shininess + 4)) /
-		(8 * _PI_ * (uniform_shininess + 1.0 / pow(2, uniform_shininess / 2.0)));
+		((alpha + 2) * (alpha + 4)) /
+		(8 * _PI_ * (alpha + 1.0 / pow(2, alpha / 2.0)));
 
 	vec3 diffuse = kd * NdotL;
-	vec3 specular = NdotL > 0.0 ? ks * fn * pow(NdotH, uniform_shininess) : vec3(0.0);
+	vec3 specular = NdotL > 0.0 ? ks * fn * pow(NdotH, alpha) : vec3(0.0);
 
-	return (diffuse + specular) * uniform_light_color + uniform_ambient;
+	float dist = distance(uniform_light_pos, pPos);
+
+	vec3 brdf = (diffuse + specular) * uniform_light_color / pow(dist, 2);
+	return brdf + pEmission;
+}
+
+vec3 fresnel(
+	const in vec3 diffColor,
+	const in vec3 reflectance,
+	const in float VdotH,
+	const in float metallic)
+{
+	const vec3 f0 = mix(reflectance, diffColor, metallic);
+	float u = 1.0 - VdotH;
+	float u5 = (u * u) * (u * u) * u;
+	return min(vec3(1.0), f0  + (vec3(1.0) - f0) * u5);
+}
+
+float distribution(float NdotH, float a)
+{
+	float NdotH2 = NdotH * NdotH;
+	float a2 = a * a;
+	float denom = (NdotH2 * (a2 - 1) + 1);
+	denom = _PI_ * denom * denom;
+	float D = a2 / max(denom, 0.001);
+	return D;
+}
+
+float geometric(float NH, float NO, float HO, float NI)
+{
+	float G = 2.0 * NH * min(NI, NO) / (0.001 + HO);
+	return min(1.0, G);
+}
+
+vec3 cook_torrance(
+	const in vec3 pSurfToEye,
+	const in vec3 pSurfToLight,
+	const in vec3 pPos,
+	const in vec3 pNormal,
+	const in vec3 pAlbedo,
+	const in vec4 pMask,
+	const in vec3 pEmission)
+{
+	vec3 halfVector = normalize(pSurfToEye + pSurfToLight);
+
+	float NdotL = clamp(dot(pNormal, pSurfToLight), 0.0, 1.0);
+	float NdotV = clamp(dot(pNormal, pSurfToEye), 0.0, 1.0);
+	float NdotH = clamp(dot(pNormal, halfVector), 0.0, 1.0);
+	float HdotV = clamp(dot(halfVector, pSurfToEye), 0.0, 1.0);
+	float HdotL = clamp(dot(halfVector, pSurfToLight), 0.0, 1.0);
+
+	float metallic = pMask.r;
+	float ao = pMask.g;
+	vec3 reflectance = vec3(pMask.b);
+	float alpha = pMask.a;
+
+	vec3 F = fresnel(pAlbedo, reflectance, max(dot(halfVector, pSurfToEye), 0.0), metallic);
+	float D = distribution(NdotH, alpha);
+	float G = geometric(NdotH, NdotV, HdotV, NdotL);
+	vec3 ks = (F * G * D) / max((4.0 * NdotL * NdotV), 0.0001);
+	vec3 kd = (pAlbedo / _PI_) * (1.0 - F) * (1.0 - metallic);
+	float dist = distance(uniform_light_pos, pPos);
+
+	return (ks + kd) * (uniform_light_color / pow(dist, 2)) * NdotL + pEmission;
 }
 
 void main(void)
 {
-	vec3 surfToEye = normalize(uniform_camera_pos - f_position_wcs);
-	vec3 surfToLight = normalize(uniform_light_pos - f_position_wcs);
+    float d = texture(uniform_tex_depth, f_texcoord).r;
+
+	if(d == 1.0) discard;
+
+	vec4 pos_wcs = texture(uniform_tex_pos, f_texcoord);
+	vec4 normal_wcs = texture(uniform_tex_normal, f_texcoord);
+	vec4 albedo = texture(uniform_tex_albedo, f_texcoord);
+	vec4 mask = texture(uniform_tex_mask, f_texcoord);
+
+	vec3 surfToEye = normalize(uniform_camera_pos - pos_wcs.xyz);
+	vec3 surfToLight = normalize(uniform_light_pos - pos_wcs.xyz);
 
 	// check if we have shadows
-	float shadow_value = (uniform_cast_shadows == 1) ? shadow(f_position_wcs) : 1.0;
+	float shadow_value = (uniform_cast_shadows == 1) ? shadow(pos_wcs.xyz) : 1.0;
 
-	vec3 brdf = blinn_phong(surfToEye, surfToLight);
-	float spotEffect =  compute_spotlight(surfToLight);
-	float dist = distance(uniform_light_pos, f_position_wcs);
+	/*
+	vec3 brdf = blinn_phong(surfToEye, surfToLight, pos_wcs.xyz,
+		normal_wcs.xyz,
+		albedo.xyz, mask,
+		vec3(pos_wcs.a, normal_wcs.a, albedo.a));*/
 
-	out_color = vec4(shadow_value * brdf * spotEffect / pow(dist, 2), 1.0);
+	float spotEffect = 1.0;//compute_spotlight(surfToLight);
+
+	//out_color = vec4(shadow_value * brdf * spotEffect, 1.0);
+
+	out_color = vec4(cook_torrance(surfToEye, surfToLight, pos_wcs.xyz,
+		normal_wcs.xyz,
+		albedo.xyz, mask,
+		vec3(pos_wcs.a, normal_wcs.a, albedo.a)), 1.0);
 }

@@ -170,6 +170,11 @@
   <ItemGroup>
     <None Include="Assets\Shaders\basic_rendering.frag" />
     <None Include="Assets\Shaders\basic_rendering.vert" />
+    <None Include="Assets\Shaders\deferred pass.frag" />
+    <None Include="Assets\Shaders\deferred pass.vert" />
+    <None Include="Assets\Shaders\geometry pass.frag" />
+    <None Include="Assets\Shaders\geometry pass.geom" />
+    <None Include="Assets\Shaders\geometry pass.vert" />
     <None Include="Assets\Shaders\post_process.frag" />
     <None Include="Assets\Shaders\post_process.vert" />
     <None Include="Assets\Shaders\shadow_map_rendering.frag" />

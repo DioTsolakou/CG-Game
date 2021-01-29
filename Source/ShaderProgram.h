@@ -12,10 +12,11 @@ class ShaderProgram
 	// filepaths of the shaders
 	const char* vertexShaderFilename;
 	const char* fragmentShaderFilename;
-	
+	const char* geometryShaderFilename;
+
 	// program and shaders
 	GLuint program;
-	GLuint vs, fs;
+	GLuint vs, fs, gs;
 
 	// hash map with uniform indices
 	std::unordered_map<std::string, GLint> uniforms;
@@ -27,7 +28,8 @@ public:
 	// Load Vertex and Fragment shader
 	int LoadVertexShaderFromFile(const char* filename);
 	int LoadFragmentShaderFromFile(const char* filename);
-	
+	int LoadGeometryShaderFromFile(const char* filename);
+
 	// Create the program using the provided vertex and fragment shader
 	bool CreateProgram();
 

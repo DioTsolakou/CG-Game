@@ -11,7 +11,7 @@ LightNode::LightNode()
 	m_light_position = glm::vec3(0, 0, 0);
 	m_light_color = glm::vec3(1.0f);
 	SetPosition(m_light_position);
-	SetConeSize(5, 5);
+	SetConeSize(60, 60);
 
 	m_cast_shadow = false;
 	m_shadow_map_resolution = 1024;
@@ -49,7 +49,7 @@ void LightNode::CastShadow(bool cast)
 		glBindFramebuffer(GL_FRAMEBUFFER, m_shadow_map_fbo);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_shadow_map_texture, 0);
 		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
+		//glReadBuffer(GL_NONE);
 
 		GLenum status = Tools::CheckFramebufferStatus(m_shadow_map_fbo);
 		if (status != GL_FRAMEBUFFER_COMPLETE)
@@ -63,12 +63,12 @@ void LightNode::CastShadow(bool cast)
 }
 
 
-void LightNode::SetColor(const glm::vec3 & color)
+void LightNode::SetColor(const glm::vec3& color)
 {
 	m_light_color = color;
 }
 
-void LightNode::SetPosition(const glm::vec3 & pos)
+void LightNode::SetPosition(const glm::vec3& pos)
 {
 	m_light_position = pos;
 	m_light_direction = glm::normalize(m_light_target - m_light_position);
@@ -76,7 +76,7 @@ void LightNode::SetPosition(const glm::vec3 & pos)
 	m_view_inverse_matrix = glm::inverse(m_view_matrix);
 }
 
-void LightNode::SetTarget(const glm::vec3 & target)
+void LightNode::SetTarget(const glm::vec3& target)
 {
 	m_light_target = target;
 	m_light_direction = glm::normalize(m_light_target - m_light_position);

@@ -15,7 +15,7 @@ namespace Tools
 		size_t length = in.tellg();
 		in.seekg(0, in.beg);
 
-		char * buffer = new char[length + 1];
+		char* buffer = new char[length + 1];
 		in.read(buffer, length);
 		buffer[length] = '\0';
 
