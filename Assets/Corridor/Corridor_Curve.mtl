@@ -2,14 +2,14 @@
 # Material Count: 1
 
 newmtl wire_154185229
-Ns 31.999996
-Ka 1.000000 1.000000 1.000000
-Kd 1.000000 1.000000 1.000000
-Ks 0.033333 0.033333 0.033333
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 1.000000
-illum 2
-map_Bump maps\\Corridor_Straight_main_Normal.png
-map_Kd maps\\Corridor_Straight_main_BaseMap.png
-map_Ks maps\\Corridor_Straight_main_MaskMap.png
+	Ns 32
+	Ka 0.0 0.0 0.0
+	Kd 1.0 1.0 1.0
+	Ks 0.0 0.1 0.0
+	Ke 0.000000 0.000000 0.000000
+	Ni 1.450000
+	d 1
+	illum 2
+	map_Bump Corridor_Straight_main_Normal.png
+	map_Kd Corridor_Straight_main_BaseMap.png
+	map_Ks Corridor_Straight_main_MaskMap.png
