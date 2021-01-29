@@ -592,6 +592,8 @@ void Renderer::RenderStaticGeometry()
 	}
 }
 
+bool check = true;
+int i = -1;
 void Renderer::RenderCollidableGeometry()
 {
 	glm::mat4 proj = m_projection_matrix * m_view_matrix * m_world_matrix;
@@ -604,12 +606,18 @@ void Renderer::RenderCollidableGeometry()
 		int32_t primID = -1;
 		int32_t totalRenderedPrims = 0;
 
-		/*if (node->intersectRay(m_camera_position, camera_dir, m_world_matrix, isectT, primID)) {
-			if (isectT > 0.f) {
-				std::cout << "dist: " << isectT << std::endl;
-				continue;
+		if (check) {
+			if (node->intersectRay(m_camera_position, camera_dir, m_world_matrix, isectT, primID)) {
+				if (isectT > 0.f) {
+					std::cout << "dist: " << isectT << std::endl;
+					check = false;
+					continue;
+				}
 			}
-		}*/
+		}
+		i++;
+		if (i == this->m_collidables_nodes.size() - 1) {check = true; i = 0;}
+		//if (node - this->m_collidables_nodes.begin() == this->m_collidables_nodes.end() - 1) check = true;
 		//node->intersectRay(m_camera_position, camera_dir, m_world_matrix, isectT, primID);
 
 		glBindVertexArray(node->m_vao);
