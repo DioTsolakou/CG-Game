@@ -106,7 +106,7 @@ void Renderer::InitCamera()
 	this->FOV = 90.f;
 	this->aspectRatio = this->m_screen_width / (float)this->m_screen_height;
 	this->nearPlane = 0.1f;
-	this->farPlane = 10000.f;
+	this->farPlane = 100.f;
 
 	this->m_camera_position = glm::vec3(0, 0, -1.5);
 	this->m_camera_target_position = glm::vec3(0, 0, 0.1);
@@ -119,7 +119,7 @@ void Renderer::InitCamera()
 
 bool Renderer::InitLights()
 {
-	this->m_light.SetColor(glm::vec3(70.f));
+	this->m_light.SetColor(glm::vec3(108.f, 86.f, 64.f));
 	this->m_light.SetPosition(this->m_camera_position);
 	this->m_light.SetTarget(this->m_camera_target_position);
 	this->m_light.SetConeSize(500, 1000);
@@ -604,7 +604,12 @@ void Renderer::RenderCollidableGeometry()
 		int32_t primID = -1;
 		int32_t totalRenderedPrims = 0;
 
-		//if (node->intersectRay(m_camera_position, camera_dir, m_world_matrix, isectT, primID)) continue;
+		/*if (node->intersectRay(m_camera_position, camera_dir, m_world_matrix, isectT, primID)) {
+			if (isectT > 0.f) {
+				std::cout << "dist: " << isectT << std::endl;
+				continue;
+			}
+		}*/
 		//node->intersectRay(m_camera_position, camera_dir, m_world_matrix, isectT, primID);
 
 		glBindVertexArray(node->m_vao);
