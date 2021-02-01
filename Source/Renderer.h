@@ -123,6 +123,7 @@ public:
 	glm::mat4									rotate(CollidableNode& object, glm::vec3 rotation);
 	glm::mat4									move(CollidableNode& object, glm::vec3 movement);
 	glm::mat4									scale(CollidableNode& object, glm::vec3 scale);
+	void										buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets);
 };
 
 #endif
