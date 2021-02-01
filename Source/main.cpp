@@ -236,7 +236,7 @@ int main(int argc, char* argv[])
 			fps_frames = 0;
 		}
 
-		cout << fps_current << endl;
+		//cout << fps_current << endl;
 
 		//SDL_WarpMouseInWindow(window, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); might be unnecessary
 

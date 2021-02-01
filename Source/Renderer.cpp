@@ -51,54 +51,11 @@ bool Renderer::Init(int SCREEN_WIDTH, int SCREEN_HEIGHT)
 		return false;
 	}
 
-	this->BuildWorld();
 	this->InitCamera();
 
 	//If everything initialized
 	return techniques_initialization && meshes_initialization &&
 		common_initialization && inter_buffers_initialization;
-}
-
-void Renderer::BuildWorld()
-{
-	/*GeometryNode& beam = *this->m_nodes[MAP_ASSETS::BEAM];
-	GeometryNode& cannon = *this->m_nodes[MAP_ASSETS::CANNON];
-	GeometryNode& cannon_mount = *this->m_nodes[MAP_ASSETS::CANNON_MOUNT];*/
-
-
-	//CollidableNode& corridor_straight = *this->m_collidables_nodes[0];
-	
-	/*beam.model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 5.f, 0.f));
-	beam.m_aabb.center = glm::vec3(beam.model_matrix * glm::vec4(beam.m_aabb.center, 1.f));
-
-	glm::mat4 R = glm::rotate(glm::mat4(1.f), glm::radians(-60.f), glm::vec3(0.f, 1.f, 0.f));
-
-	cannon.model_matrix = 
-		glm::translate(glm::mat4(1.f), glm::vec3(cannon.m_aabb.center.x, cannon.m_aabb.center.y, cannon.m_aabb.center.z)) *
-		R *
-		glm::translate(glm::mat4(1.f), glm::vec3(-cannon.m_aabb.center.x, -cannon.m_aabb.center.y, -cannon.m_aabb.center.z));
-
-
-	cannon.m_aabb.center = glm::vec3(cannon.model_matrix * glm::vec4(cannon.m_aabb.center, 1.f));
-
-	cannon_mount.model_matrix = glm::mat4(1.f);*/
-
-	/*CollidableNode& pipe0 = *this->m_collidables_nodes[0];
-	CollidableNode& pipe1 = *this->m_collidables_nodes[1];
-	CollidableNode& pipe2 = *this->m_collidables_nodes[2];
-
-	pipe0.model_matrix = rotate(pipe0, 181.25f, 173.8f, 90.74f);
-	pipe0.m_aabb.center = glm::vec3(pipe0.model_matrix * glm::vec4(pipe0.m_aabb.center, 1.f));
-
-	pipe1.model_matrix = move(pipe1, 0.f, 5.f, 0.f) * rotate(pipe1, 90.f, 0.f, 0.f);
-	pipe1.m_aabb.center = glm::vec3(pipe1.model_matrix * glm::vec4(pipe1.m_aabb.center, 1.f));
-
-	pipe2.model_matrix = move(pipe2, 5.f, 0.f, 0.f);
-	pipe2.m_aabb.center = glm::vec3(pipe2.model_matrix * glm::vec4(pipe2.m_aabb.center, 1.f));*/
-
-	//createMap();
-
-	this->m_world_matrix = glm::mat4(1.f);
 }
 
 void Renderer::InitCamera()
@@ -270,7 +227,7 @@ bool Renderer::InitGeometricMeshes()
 {
 	std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets = {
 		"Assets/Beam/Beam.obj",
-		//"Assets/Beam/CH-Beam.obj",
+		"Assets/Beam/CH-Beam.obj",
 
 		//"Assets/Cannon/Cannon.obj",
 		//"Assets/Cannon/CH-Cannon.obj",
@@ -278,52 +235,36 @@ bool Renderer::InitGeometricMeshes()
 		//"Assets/Cannon/CannonMount.obj",
 		//"Assets/Cannon/CH-CannonMount.obj",
 
-		"Assets/Corridor/Corridor_Curve.obj",
 
 		"Assets/Corridor/Corridor_Fork.obj",
-		//"Assets/Corridor/CH-Corridor_Fork.obj",
+		"Assets/Corridor/CH-Corridor_Fork.obj",
 
 		"Assets/Corridor/Corridor_Straight.obj",
-		//"Assets/Corridor/CH-Corridor_Straight.obj",
+		"Assets/Corridor/CH-Corridor_Straight.obj",
 
 		"Assets/Corridor/Corridor_Left.obj",
-		//"Assets/Corridor/CH-Corridor_Left.obj",
+		"Assets/Corridor/CH-Corridor_Left.obj",
 
 		"Assets/Corridor/Corridor_Right.obj",
-		//"Assets/Corridor/CH-Corridor_Right.obj",
+		"Assets/Corridor/CH-Corridor_Right.obj",
 		
 		//"Assets/Iris/Iris.obj",
 		//"Assets/Iris/CH-Iris.obj",
 
 		"Assets/Pipe/Pipe.obj",
-		//"Assets/Pipe/CH-Pipe.obj",
+		"Assets/Pipe/CH-Pipe.obj",
 
 		"Assets/Wall/Wall.obj",
-		//"Assets/Wall/CH-Wall.obj",
+		"Assets/Wall/CH-Wall.obj",
+
+		"Assets/Corridor/Corridor_Curve.obj",
 	};
 
 	bool initialized = true;
 
-	/*for (int32_t i = 0; i < MAP_ASSETS::SIZE_ALL - 1; ++i)
-	{
-		auto& asset = mapAssets[i];
-		GeometricMesh* mesh = loader.load(asset);
-
-		if (mesh != nullptr)
-		{
-			GeometryNode* node = new GeometryNode();
-			node->Init(mesh);
-			this->m_nodes.push_back(node);
-			delete mesh;
-		}
-		else
-		{
-			initialized = false;
-		}
-	}*/
-
 	buildMap(initialized, mapAssets);
-
+	std::cout << "geometry nodes legnth = " << this->m_nodes.size() << std::endl;
+	std::cout << "collidable nodes legnth = " << this->m_collidables_nodes.size() << std::endl;
 
 	return initialized;
 }
@@ -337,7 +278,10 @@ void Renderer::Update(float dt)
 
 void Renderer::UpdateGeometry(float dt)
 {
-
+	for (auto& node : this->m_nodes)
+	{
+		node->app_model_matrix = node->model_matrix;
+	}
 	for (auto& node : this->m_collidables_nodes)
 	{
 		node->app_model_matrix = node->model_matrix;
@@ -348,12 +292,13 @@ void Renderer::UpdateCamera(float dt)
 {
 	glm::vec3 direction = glm::normalize(m_camera_target_position - m_camera_position);
 
+	int distance = 12.5;
 	for (auto& node : this->m_collidables_nodes)
 	{
 		float_t isectT = 0.f;
 		int32_t primID = -1;
 		if (node->intersectRay(m_camera_position, direction, m_world_matrix, isectT, primID)) {
-			if (isectT < 10) { // min allowed distance = 10
+			if (isectT < distance) { // min allowed distance = 10
 				m_camera_movement = glm::vec3(0.f);
 				break;
 			}
@@ -404,7 +349,7 @@ void Renderer::Render()
 
 	if (error != GL_NO_ERROR)
 	{
-		printf("Reanderer:Draw GL Error\n");
+		printf("Renderer:Draw GL Error\n");
 		system("pause");
 	}
 }
@@ -459,6 +404,9 @@ void Renderer::RenderStaticGeometry()
 {
 	glm::mat4 proj = m_projection_matrix * m_view_matrix * m_world_matrix;
 
+	/*glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
+
 	for (auto& node : this->m_nodes)
 	{
 		glBindVertexArray(node->m_vao);
@@ -510,18 +458,27 @@ void Renderer::RenderStaticGeometry()
 
 		glBindVertexArray(0);
 	}
+
+	//glDisable(GL_BLEND);
 }
 
-bool check = true;
-int i = -1;
+//bool check = true;
+//int i = -1;
 void Renderer::RenderCollidableGeometry()
 {
 	glm::mat4 proj = m_projection_matrix * m_view_matrix * m_world_matrix;
 
 	glm::vec3 camera_dir = normalize(m_camera_target_position - m_camera_position);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ZERO, GL_ONE);
+
+	int i = 0;
 	for (auto& node : this->m_collidables_nodes)
 	{
+		glEnable(GL_BLEND);
+		if (std::find(this->m_curve_positions.begin(), this->m_curve_positions.end(), i) != this->m_curve_positions.end())
+			glDisable(GL_BLEND);
 		float_t isectT = 0.f;
 		int32_t primID = -1;
 		int32_t totalRenderedPrims = 0;
@@ -548,6 +505,7 @@ void Renderer::RenderCollidableGeometry()
 		m_geometry_program.loadMat4("uniform_world_matrix", m_world_matrix * node->app_model_matrix);
 		m_geometry_program.loadFloat("uniform_time", m_continous_time);
 
+		
 		for (int j = 0; j < node->parts.size(); ++j)
 		{
 			m_geometry_program.loadVec3("uniform_diffuse", node->parts[j].diffuse);
@@ -589,10 +547,17 @@ void Renderer::RenderCollidableGeometry()
 
 			glDrawArrays(GL_TRIANGLES, node->parts[j].start_offset, node->parts[j].count);
 			totalRenderedPrims += node->parts[j].count;
+			
 		}
 
 		glBindVertexArray(0);
+
+		/*if (std::find(this->m_curve_positions.begin(), this->m_curve_positions.end(), i) != this->m_curve_positions.end())
+			glEnable(GL_BLEND);*/
+		i++;
 	}
+
+	glDisable(GL_BLEND);
 }
 
 void Renderer::RenderDeferredShading()
@@ -785,7 +750,13 @@ void Renderer::CameraRollRight(bool enable)
 	m_camera_up_vector = glm::mat3(roll_mat) * m_camera_up_vector;
 }
 
-glm::mat4 Renderer::rotate(CollidableNode& object, glm::vec3 rotation)
+glm::mat4 Renderer::move(GeometryNode& object, glm::vec3 movement)
+{
+	object.model_matrix = glm::translate(glm::mat4(1.f), movement);
+	return object.model_matrix;
+}
+
+glm::mat4 Renderer::rotate(GeometryNode& object, glm::vec3 rotation)
 {
 	glm::mat4 rotationX;
 	glm::mat4 rotationY;
@@ -802,13 +773,7 @@ glm::mat4 Renderer::rotate(CollidableNode& object, glm::vec3 rotation)
 	return object.model_matrix;
 }
 
-glm::mat4 Renderer::move(CollidableNode& object, glm::vec3 movement)
-{
-	object.model_matrix = glm::translate(glm::mat4(1.f), movement);
-	return object.model_matrix;
-}
-
-glm::mat4 Renderer::scale(CollidableNode& object, glm::vec3 scale)
+glm::mat4 Renderer::scale(GeometryNode& object, glm::vec3 scale)
 {
 	object.model_matrix = glm::scale(glm::mat4(1.f), scale);
 	return object.model_matrix;
@@ -820,16 +785,30 @@ void Renderer::placeObject(bool &init, std::array<const char*, MAP_ASSETS::SIZE_
 	GeometricMesh* mesh;
 
 	mesh = loader.load(map_assets[asset]);
+	std::cout << "asset int: " << asset << std::endl;
 
 	if (mesh != nullptr)
 	{
-		CollidableNode* node = new CollidableNode();
-		node->Init(mesh);
-		this->m_collidables_nodes.push_back(node);
-		//CollidableNode* temp = &(*this->m_collidables_nodes[this->m_collidables_nodes.size - 1]);
+		GeometryNode* temp;
+		if (asset % 2 == 0 && asset != CORRIDOR_CURVE)
+		{
+			GeometryNode* node = new GeometryNode();
+			node->Init(mesh);
+			this->m_nodes.push_back(node);
+			temp = node;
 
-		CollidableNode* temp = node;
-
+			int nextAsset = static_cast<int>(asset);
+			nextAsset++;
+			placeObject(init, map_assets, static_cast<MAP_ASSETS>(nextAsset), move, rotate, scale);
+		}
+		else
+		{
+			CollidableNode* node = new CollidableNode();
+			node->Init(mesh);
+			this->m_collidables_nodes.push_back(node);
+			if (asset == CORRIDOR_CURVE) this->m_curve_positions.push_back(this->m_collidables_nodes.size() - 1);
+			temp = node;
+		}
 		temp->model_matrix = Renderer::move(*temp, move) * Renderer::rotate(*temp, rotate) * Renderer::scale(*temp, scale);
 		temp->m_aabb.center = glm::vec3(temp->model_matrix * glm::vec4(temp->m_aabb.center, 1.f));
 		delete mesh;
@@ -884,4 +863,6 @@ void Renderer::buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::S
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(31.f, 0.f, -114.25f), glm::vec3(0.f, -90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(4.f, 0.f, -119.f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_FORK, glm::vec3(-0.75f, 0.f, -141.25f), glm::vec3(0.f, 180.f, 0.f));
+
+	this->m_world_matrix = glm::mat4(1.f);
 }

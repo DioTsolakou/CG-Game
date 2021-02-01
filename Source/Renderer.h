@@ -21,16 +21,6 @@ protected:
 	glm::vec3										m_camera_up_vector;
 	glm::vec3										m_camera_movement;
 	glm::vec2										m_camera_look_angle_destination;
-
-	std::vector<CollidableNode*> pipes; //3 pipes
-	std::vector<CollidableNode*> beamArray; //6 beams
-	std::vector<CollidableNode*> corridorStraightArray; //41 corridorStraight
-	std::vector<CollidableNode*> corridorLeftArray; //14 corridorLeft
-	std::vector<CollidableNode*> corridorRightArray; //5 corridorRight
-	std::vector<CollidableNode*> corridorForkArray; //4 corridorFork
-	std::vector<CollidableNode*> corridorCurveArray; //18 corridorCurve
-	//CollidableNode cannonArray[];
-	//CollidableNode cannonMountArray[];
 	
 	float m_continous_time;
 	float FOV;
@@ -41,26 +31,26 @@ protected:
 	enum MAP_ASSETS
 	{
 		BEAM = 0,
-		//CH_BEAM,
+		CH_BEAM,
 		//CANNON,
 		//CH_CANNON,
 		//CANNON_MOUNT,
 		//CH_CANNON_MOUNT,
-		CORRIDOR_CURVE,
 		CORRIDOR_FORK,
-		//CH_CORRIDOR_FORK,
+		CH_CORRIDOR_FORK,
 		CORRIDOR_STRAIGHT,
-		//CH_CORRIDOR_STRAIGHT,
+		CH_CORRIDOR_STRAIGHT,
 		CORRIDOR_LEFT,
-		//CH_CORRIDOR_LEFT,
+		CH_CORRIDOR_LEFT,
 		CORRIDOR_RIGHT,
-		//CH_CORRIDOR_RIGHT,
+		CH_CORRIDOR_RIGHT,
 		//IRIS,
 		//CH_IRIS,
 		PIPE,
-		//CH_PIPE,
+		CH_PIPE,
 		WALL,
-		//CH_WALL,
+		CH_WALL,
+		CORRIDOR_CURVE,
 		SIZE_ALL
 	};
 
@@ -70,7 +60,6 @@ protected:
 	bool InitCommonItems();
 	bool InitLights();
 	bool InitIntermediateBuffers();
-	void BuildWorld();
 	void InitCamera();
 	void RenderGeometry();
 	void RenderDeferredShading();
@@ -82,6 +71,7 @@ protected:
 
 	std::vector<GeometryNode*> m_nodes;
 	std::vector<CollidableNode*> m_collidables_nodes;
+	std::vector<int> m_curve_positions;
 
 	LightNode									m_light;
 	ShaderProgram								m_geometry_program;
@@ -120,9 +110,9 @@ public:
 	void										CameraLook(glm::vec2 lookDir);
 	void										CameraRollLeft(bool enable);
 	void										CameraRollRight(bool enable);
-	glm::mat4									rotate(CollidableNode& object, glm::vec3 rotation);
-	glm::mat4									move(CollidableNode& object, glm::vec3 movement);
-	glm::mat4									scale(CollidableNode& object, glm::vec3 scale);
+	glm::mat4									move(GeometryNode& object, glm::vec3 movement);
+	glm::mat4									rotate(GeometryNode& object, glm::vec3 rotation);
+	glm::mat4									scale(GeometryNode& object, glm::vec3 scale);
 	void										buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets);
 };
 
