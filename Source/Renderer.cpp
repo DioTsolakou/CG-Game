@@ -292,13 +292,12 @@ void Renderer::UpdateCamera(float dt)
 {
 	glm::vec3 direction = glm::normalize(m_camera_target_position - m_camera_position);
 
-	int distance = 12.5;
+	float distance = 12.5;
 	for (auto& node : this->m_collidables_nodes)
 	{
 		float_t isectT = 0.f;
 		int32_t primID = -1;
 		if (node->calculateCameraCollision(m_camera_position, direction, m_world_matrix, isectT, primID)) {
-			//std::cout << "distance: " << isectT << std::endl;
 			if (isectT < distance) {
 				m_camera_movement = glm::vec3(0.f);
 				break;

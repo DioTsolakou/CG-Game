@@ -85,10 +85,10 @@ bool CollidableNode::calculateCameraCollision(const glm::vec3& pOrigin, const gl
     float min = 999;
     int numOfRays = 16;
     for (int i = 0; i < numOfRays; i++) {
-        this->intersectRay(pOrigin, pDir, pWorldMatrix, pIsectDist, pPrimID, pTmax, pTmin, i * 360/numOfRays);
+        this->intersectRay(pOrigin, pDir, pWorldMatrix, pIsectDist, pPrimID, pTmax, pTmin, (float) i * 360/numOfRays);
         if (pIsectDist < min) min = pIsectDist;
     }
     pIsectDist = min;
-    std::cout << "min " << min << std::endl;
+    //std::cout << "min " << min << std::endl;
     return true;
 }
