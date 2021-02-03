@@ -63,10 +63,10 @@ void Renderer::InitCamera()
 	this->FOV = 90.f;
 	this->aspectRatio = this->m_screen_width / (float)this->m_screen_height;
 	this->nearPlane = 0.1f;
-	this->farPlane = 100.f;
+	this->farPlane = 200.f;
 
 	this->m_camera_position = glm::vec3(0, 0, -1.5);
-	this->m_camera_target_position = glm::vec3(0, 0, 0.1);
+	this->m_camera_target_position = glm::vec3(0, 0, -2.5);
 	this->m_camera_up_vector = glm::vec3(0, 1, 0);
 
 	this->m_view_matrix = glm::lookAt(this->m_camera_position, this->m_camera_target_position, m_camera_up_vector);
@@ -297,8 +297,9 @@ void Renderer::UpdateCamera(float dt)
 	{
 		float_t isectT = 0.f;
 		int32_t primID = -1;
-		if (node->intersectRay(m_camera_position, direction, m_world_matrix, isectT, primID)) {
-			if (isectT < distance) { // min allowed distance = 10
+		if (node->calculateCameraCollision(m_camera_position, direction, m_world_matrix, isectT, primID)) {
+			//std::cout << "distance: " << isectT << std::endl;
+			if (isectT < distance) {
 				m_camera_movement = glm::vec3(0.f);
 				break;
 			}
@@ -325,6 +326,7 @@ void Renderer::UpdateCamera(float dt)
 
 	//std::cout << m_camera_position.x << " " << m_camera_position.y << " " << m_camera_position.z << " " << std::endl;
 	//std::cout << m_camera_target_position.x << " " << m_camera_target_position.y << " " << m_camera_target_position.z << " " << std::endl;
+	//std::cout << m_light.GetTarget().x << " " << m_light.GetTarget().y << " " << m_light.GetTarget().z << " " << std::endl;
 	m_light.SetPosition(m_camera_position);
 	m_light.SetTarget(m_camera_target_position);
 }
@@ -692,8 +694,7 @@ void Renderer::RenderShadowMaps()
 
 		for (auto& node : this->m_collidables_nodes)
 		{
-			//if (node->intersectRay(m_camera_position, camera_dir, m_world_matrix, isectT, primID)) continue;
-			node->intersectRay(m_camera_position, camera_dir, m_world_matrix, isectT, primID);
+			//node->intersectRay(m_camera_position, camera_dir, m_world_matrix, isectT, primID);
 
 			glBindVertexArray(node->m_vao);
 
@@ -785,7 +786,6 @@ void Renderer::placeObject(bool &init, std::array<const char*, MAP_ASSETS::SIZE_
 	GeometricMesh* mesh;
 
 	mesh = loader.load(map_assets[asset]);
-	std::cout << "asset int: " << asset << std::endl;
 
 	if (mesh != nullptr)
 	{

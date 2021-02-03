@@ -38,6 +38,7 @@ public:
 	void SetConeSize(float umbra, float penumbra);
 
 	glm::vec3 GetPosition();
+	glm::vec3 GetTarget();
 	glm::vec3 GetDirection();
 	glm::vec3 GetColor();
 

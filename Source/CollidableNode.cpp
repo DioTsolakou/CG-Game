@@ -1,6 +1,8 @@
 #include "GeometricMesh.h"
 #include "CollidableNode.h"
 #include "glm/gtx/intersect.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include <iostream>
 
 CollidableNode::CollidableNode(void) :
     GeometryNode()
@@ -30,12 +32,15 @@ bool CollidableNode::intersectRay(
     float& pIsectDist,
     int32_t& pPrimID,
     float pTmax,
-    float pTmin)
+    float pTmin,
+    float angle)
 {
     if (pTmax < pTmin || glm::length(pDir_wcs) < glm::epsilon<float>()) return false;
 
-    const glm::vec3 normDir = glm::normalize(pDir_wcs);
+    glm::vec3 normDir = pDir_wcs;// glm::normalize(pDir_wcs);
 
+    glm::mat4 rotation = glm::rotate(glm::mat4(1.f), glm::radians(angle), glm::vec3(0.f, 1.f, 0.f));
+    normDir = rotation * glm::vec4(normDir, 0.f);
     const glm::mat4 wordToModel = glm::inverse(pWorldMatrix * super::app_model_matrix);
     const glm::vec3 o_local = wordToModel * glm::vec4(pOrigin_wcs, 1.f);
     const glm::vec3 d_local = glm::normalize(glm::vec3(wordToModel * glm::vec4(normDir, 0.f)));
@@ -73,4 +78,17 @@ bool CollidableNode::intersectRay(
     }
 
     return found_isect;
+}
+
+bool CollidableNode::calculateCameraCollision(const glm::vec3& pOrigin, const glm::vec3& pDir, const glm::mat4& pWorldMatrix, float& pIsectDist, int32_t& pPrimID, float pTmax, float pTmin) 
+{
+    float min = 999;
+    int numOfRays = 16;
+    for (int i = 0; i < numOfRays; i++) {
+        this->intersectRay(pOrigin, pDir, pWorldMatrix, pIsectDist, pPrimID, pTmax, pTmin, i * 360/numOfRays);
+        if (pIsectDist < min) min = pIsectDist;
+    }
+    pIsectDist = min;
+    std::cout << "min " << min << std::endl;
+    return true;
 }

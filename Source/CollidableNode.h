@@ -15,7 +15,7 @@ public:
     CollidableNode& operator=(CollidableNode&&) = default;
 
     void Init(GeometricMesh* mesh) override;
-    bool intersectRay(const glm::vec3& pOrigin, const glm::vec3& pDir, const glm::mat4& pWorldMatrix, float& pIsectDist, int32_t& pPrimID, float pTmax = 1.e+15f, float pTmin = 0.f);
+    bool calculateCameraCollision(const glm::vec3& pOrigin, const glm::vec3& pDir, const glm::mat4& pWorldMatrix, float& pIsectDist, int32_t& pPrimID, float pTmax = 1.e+15f, float pTmin = 0.f);
 
 protected:
 
@@ -28,4 +28,5 @@ private:
     struct triangle { glm::vec3 v0, v1, v2; };
 
     std::vector<triangle> triangles;
+    bool intersectRay(const glm::vec3& pOrigin, const glm::vec3& pDir, const glm::mat4& pWorldMatrix, float& pIsectDist, int32_t& pPrimID, float pTmax = 1.e+15f, float pTmin = 0.f, float angle = 0.f);
 };

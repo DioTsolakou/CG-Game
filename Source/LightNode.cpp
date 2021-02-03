@@ -102,6 +102,11 @@ glm::vec3 LightNode::GetPosition()
 	return m_light_position;
 }
 
+glm::vec3 LightNode::GetTarget()
+{
+	return m_light_target;
+}
+
 glm::vec3 LightNode::GetDirection()
 {
 	return m_light_direction;

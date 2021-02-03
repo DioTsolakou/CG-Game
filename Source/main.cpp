@@ -119,14 +119,14 @@ void keyboardInput(bool &quit, float &movement_factor)
 		{
 			renderer->CameraMoveRight(true);
 		}
-		else if (event.key.keysym.sym == SDLK_q)
+		/*else if (event.key.keysym.sym == SDLK_q)
 		{
 			renderer->CameraRollLeft(true);
 		}
 		else if (event.key.keysym.sym == SDLK_e)
 		{
 			renderer->CameraRollRight(true);
-		}
+		}*/
 		else if (event.key.keysym.sym == SDLK_r) renderer->ReloadShaders();
 	}
 	else if (event.type == SDL_KEYUP)
@@ -148,14 +148,14 @@ void keyboardInput(bool &quit, float &movement_factor)
 		{
 			renderer->CameraMoveRight(false);
 		}
-		else if (event.key.keysym.sym == SDLK_q)
+		/*else if (event.key.keysym.sym == SDLK_q)
 		{
 			renderer->CameraRollLeft(false);
 		}
 		else if (event.key.keysym.sym == SDLK_e)
 		{
 			renderer->CameraRollRight(false);
-		}
+		}*/
 	}
 }
 
@@ -236,7 +236,7 @@ int main(int argc, char* argv[])
 			fps_frames = 0;
 		}
 
-		//cout << fps_current << endl;
+		cout << "fps: " << fps_current << endl;
 
 		//SDL_WarpMouseInWindow(window, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); might be unnecessary
 
