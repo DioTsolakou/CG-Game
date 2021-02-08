@@ -19,7 +19,7 @@ protected:
 	glm::vec3										m_camera_position;
 	glm::vec3										m_camera_target_position;
 	glm::vec3										m_camera_up_vector;
-	glm::vec3										m_camera_movement;
+	glm::vec2										m_camera_movement;
 	glm::vec2										m_camera_look_angle_destination;
 	
 	float m_continous_time;
@@ -68,6 +68,7 @@ protected:
 	void RenderShadowMaps();
 	void RenderPostProcess();
 	void placeObject(bool& init, std::array<const char*, MAP_ASSETS::SIZE_ALL>& map_assets, MAP_ASSETS asset, glm::vec3 move, glm::vec3 rotate, glm::vec3 scale = glm::vec3(1.f, 1.f, 1.f));
+	void placeLight(glm::vec3 move);
 
 	std::vector<GeometryNode*> m_nodes;
 	std::vector<CollidableNode*> m_collidables_nodes;
@@ -114,6 +115,7 @@ public:
 	glm::mat4									rotate(GeometryNode& object, glm::vec3 rotation);
 	glm::mat4									scale(GeometryNode& object, glm::vec3 scale);
 	void										buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets);
+	void										collisionDetection(CollidableNode* node);
 };
 
 #endif

@@ -14,6 +14,7 @@
 Renderer::Renderer()
 {
 	this->m_nodes = {};
+	this->m_collidables_nodes = {};
 	this->m_continous_time = 0.0;
 }
 
@@ -79,7 +80,7 @@ bool Renderer::InitLights()
 	this->m_light.SetColor(glm::vec3(108.f, 86.f, 64.f));
 	this->m_light.SetPosition(this->m_camera_position);
 	this->m_light.SetTarget(this->m_camera_target_position);
-	this->m_light.SetConeSize(500, 1000);
+	this->m_light.SetConeSize(40, 50);
 	this->m_light.CastShadow(false);
 
 	return true;
@@ -291,16 +292,23 @@ void Renderer::UpdateGeometry(float dt)
 void Renderer::UpdateCamera(float dt)
 {
 	glm::vec3 direction = glm::normalize(m_camera_target_position - m_camera_position);
+	std::vector<float> isectDst;
 
 	float distance = 12.5;
 	for (auto& node : this->m_collidables_nodes)
 	{
 		float_t isectT = 0.f;
 		int32_t primID = -1;
-		if (node->calculateCameraCollision(m_camera_position, direction, m_world_matrix, isectT, primID)) {
-			if (isectT < distance) {
-				m_camera_movement = glm::vec3(0.f);
-				break;
+		isectDst.clear();
+		isectDst = node->calculateCameraCollision(m_camera_position, direction, m_world_matrix, isectT, primID);
+		for (auto it = isectDst.begin(); it != isectDst.end(); ++it) {
+			if (*it < distance) {
+				/*int pos = it - isectDst.begin();
+				if (pos >= 1 && pos <= 3) m_camera_movement.x = (m_camera_movement.x < 0) ? 0 : m_camera_movement.x;
+				if (pos >= 5 && pos <= 7) m_camera_movement.x = (m_camera_movement.x > 0) ? 0 : m_camera_movement.x;
+				if (pos >= 3 && pos <= 5) m_camera_movement.z = (m_camera_movement.z > 0) ? 0 : m_camera_movement.z;
+				if (pos == 0 || pos == 1 || pos == 7) m_camera_movement.z = (m_camera_movement.z < 0) ? 0 : m_camera_movement.z;*/
+				//break;
 			}
 		}
 	}
@@ -321,13 +329,17 @@ void Renderer::UpdateCamera(float dt)
 	direction = rotation * glm::vec4(direction, 0.f);
 	m_camera_target_position = m_camera_position + direction * glm::distance(m_camera_position, m_camera_target_position);
 
+	GeometryNode* temp = this->m_nodes.at(this->m_nodes.size() - 1);
+	temp->model_matrix = Renderer::move(*temp, m_camera_target_position - m_camera_position); // glm::vec3((m_camera_movement.x * 5.f * dt) * direction, (m_camera_movement.y * 5.f * dt) * right, 0.f));
+	temp->m_aabb.center = glm::vec3(temp->model_matrix * glm::vec4(temp->m_aabb.center, 1.f));
+
 	m_view_matrix = glm::lookAt(m_camera_position, m_camera_target_position, m_camera_up_vector);
 
 	//std::cout << m_camera_position.x << " " << m_camera_position.y << " " << m_camera_position.z << " " << std::endl;
-	//std::cout << m_camera_target_position.x << " " << m_camera_target_position.y << " " << m_camera_target_position.z << " " << std::endl;
+	std::cout << m_camera_target_position.x << " " << m_camera_target_position.y << " " << m_camera_target_position.z << " " << std::endl;
 	//std::cout << m_light.GetTarget().x << " " << m_light.GetTarget().y << " " << m_light.GetTarget().z << " " << std::endl;
-	m_light.SetPosition(m_camera_position);
-	m_light.SetTarget(m_camera_target_position);
+	this->m_light.SetPosition(m_camera_position);
+	this->m_light.SetTarget(m_camera_target_position);
 }
 
 bool Renderer::ReloadShaders()
@@ -463,8 +475,8 @@ void Renderer::RenderStaticGeometry()
 	//glDisable(GL_BLEND);
 }
 
-//bool check = true;
-//int i = -1;
+bool check = true;
+int j = 0;
 void Renderer::RenderCollidableGeometry()
 {
 	glm::mat4 proj = m_projection_matrix * m_view_matrix * m_world_matrix;
@@ -484,17 +496,17 @@ void Renderer::RenderCollidableGeometry()
 		int32_t primID = -1;
 		int32_t totalRenderedPrims = 0;
 
-		/*if (check) {
-			if (node->intersectRay(m_camera_position, camera_dir, m_world_matrix, isectT, primID)) {
+		if (check) {
+			if (node->intersectRays(m_camera_position, camera_dir, m_world_matrix, isectT, primID)) {
 				if (isectT > 0.f) {
-					std::cout << "dist: " << isectT << std::endl;
 					check = false;
-					continue;
+					collisionDetection(node);
+					//continue;
 				}
-			}
+			}		
 		}
-		i++;
-		if (i == this->m_collidables_nodes.size() - 1) {check = true; i = 0;}*/
+		j++;
+		if (j == this->m_collidables_nodes.size()) {check = true; j = 0;}
 
 		//if (node - this->m_collidables_nodes.begin() == this->m_collidables_nodes.end() - 1) check = true;
 		//node->intersectRay(m_camera_position, camera_dir, m_world_matrix, isectT, primID);
@@ -806,6 +818,7 @@ void Renderer::placeObject(bool &init, std::array<const char*, MAP_ASSETS::SIZE_
 			node->Init(mesh);
 			this->m_collidables_nodes.push_back(node);
 			if (asset == CORRIDOR_CURVE) this->m_curve_positions.push_back(this->m_collidables_nodes.size() - 1);
+			node->SetType(asset);
 			temp = node;
 		}
 		temp->model_matrix = Renderer::move(*temp, move) * Renderer::rotate(*temp, rotate) * Renderer::scale(*temp, scale);
@@ -863,5 +876,26 @@ void Renderer::buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::S
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(4.f, 0.f, -119.f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_FORK, glm::vec3(-0.75f, 0.f, -141.25f), glm::vec3(0.f, 180.f, 0.f));
 
+	//camera_target
+	//this->placeObject(initialized, mapAssets, BEAM, m_camera_target_position, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.5f, 0.5f, 0.5f));
+
 	this->m_world_matrix = glm::mat4(1.f);
+}
+
+void Renderer::collisionDetection(CollidableNode* node)
+{
+	switch (node->GetType()) 
+	{
+		case MAP_ASSETS::CH_WALL:
+			std::cout << "we hit a wall" << std::endl;
+			break;
+
+		case MAP_ASSETS::CH_BEAM:
+			std::cout << "we hit a beam" << std::endl;
+			break;
+
+		default:
+			std::cout << "we hit something else" << std::endl;
+			break;
+	}
 }
