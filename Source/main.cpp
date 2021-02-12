@@ -97,15 +97,14 @@ bool init()
 	return engine_initialized;
 }
 
-void keyboardInput(bool &quit, float &movement_factor)
+void keyboardInput(bool &quit)
 {
 	if (event.type == SDL_KEYDOWN)
 	{
 		if (event.key.keysym.sym == SDLK_ESCAPE) quit = true;
-		if (event.key.keysym.sym == SDLK_LSHIFT) movement_factor = 5.f;
 		if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP)
 		{
-			renderer->CameraMoveForward(true, movement_factor);
+			renderer->CameraMoveForward(true);
 		}
 		else if (event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN)
 		{
@@ -131,10 +130,9 @@ void keyboardInput(bool &quit, float &movement_factor)
 	}
 	else if (event.type == SDL_KEYUP)
 	{
-		if (event.key.keysym.sym == SDLK_LSHIFT) movement_factor = 1.f;
 		if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP)
 		{
-			renderer->CameraMoveForward(false, movement_factor);
+			renderer->CameraMoveForward(false);
 		}
 		else if (event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN)
 		{
@@ -203,7 +201,6 @@ int main(int argc, char* argv[])
 	bool mouse_button_pressed = false;
 	bool right_mouse_button_pressed = false;
 	glm::vec2 prev_mouse_position(0);
-	float movement_factor = 1.f;
 
 	auto simulation_start = chrono::steady_clock::now();
 
@@ -224,7 +221,7 @@ int main(int argc, char* argv[])
 					renderer->ResizeBuffers(event.window.data1, event.window.data2);
 				}
 			}
-			keyboardInput(quit, movement_factor);
+			keyboardInput(quit);
 			mouseInput(mouse_button_pressed, right_mouse_button_pressed, prev_mouse_position);
 		}
 

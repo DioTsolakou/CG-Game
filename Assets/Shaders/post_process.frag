@@ -30,8 +30,9 @@ void main(void)
 
 #ifdef PREVIEW_SHADOW_MAP
 	out_color = vec4(vec3(linearize(texture2D(uniform_shadow_map, f_texcoord).r)), 1.0);
+#endif
 
-#elif defined CROSS_HAIR
+#ifdef CROSS_HAIR
 	ivec2 halfRes = ivec2(textureSize(uniform_texture, 0) / 2);
 	ivec2 pixel = ivec2(gl_FragCoord.xy);
 

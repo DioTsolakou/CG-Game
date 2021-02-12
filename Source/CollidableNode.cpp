@@ -84,7 +84,7 @@ bool CollidableNode::intersectRay(
 }
 
 //public
-bool CollidableNode::intersectRays(
+/*bool CollidableNode::intersectRays(
     const glm::vec3& pOrigin_wcs,
     const glm::vec3& pDir_wcs,
     const glm::mat4& pWorldMatrix,
@@ -134,26 +134,17 @@ bool CollidableNode::intersectRays(
     }
 
     return found_isect;
-}
+}*/
 
 std::vector<float> CollidableNode::calculateCameraCollision(const glm::vec3& pOrigin, const glm::vec3& pDir, const glm::mat4& pWorldMatrix, float& pIsectDist, int32_t& pPrimID, float pTmax, float pTmin) 
 {
     intersectionDistance.clear();
-
-    float min = 999;
     int numOfRays = 8;
     for (int i = 0; i < numOfRays; i++) {
-        this->intersectRay(pOrigin, pDir, pWorldMatrix, pIsectDist, pPrimID, pTmax, pTmin, 0.f, (float) i * 360/numOfRays);
-        if (pIsectDist < min) min = pIsectDist;
-        intersectionDistance.push_back(pIsectDist);
+        if (this->intersectRay(pOrigin, pDir, pWorldMatrix, pIsectDist, pPrimID, pTmax, pTmin, 0.f, (float)i * 360 / numOfRays))
+            intersectionDistance.push_back(pIsectDist);
+        else 
+            intersectionDistance.push_back(999.f);
     }
-    this->intersectRay(pOrigin, pDir, pWorldMatrix, pIsectDist, pPrimID, pTmax, pTmin, -45.f, 0.f);
-    if (pIsectDist < min) min = pIsectDist;
-    intersectionDistance.push_back(pIsectDist);
-    this->intersectRay(pOrigin, pDir, pWorldMatrix, pIsectDist, pPrimID, pTmax, pTmin, 45.f, 0.f);
-    if (pIsectDist < min) min = pIsectDist;
-    pIsectDist = min;
-    intersectionDistance.push_back(pIsectDist);
-    //std::cout << "min " << min << std::endl;
     return intersectionDistance;
 }
