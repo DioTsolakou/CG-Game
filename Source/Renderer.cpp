@@ -313,10 +313,10 @@ void Renderer::UpdateCamera(float dt)
 				if (pos == 0 || pos == 1 || pos == 7) m_camera_movement.y = (m_camera_movement.y < 0) ? 0 : m_camera_movement.y;*/
 				//std::cout << pos << ": " << *it << std::endl;
 				//m_camera_movement.x *= -1; m_camera_movement.y *= -1;
-				/*if (pos >= 1 && pos <= 3) m_camera_movement.y *= (m_camera_movement.y < 0) ? -1.f : 1.f;
+				if (pos >= 1 && pos <= 3) m_camera_movement.y *= (m_camera_movement.y < 0) ? -1.f : 1.f;
 				if (pos >= 5 && pos <= 7) m_camera_movement.y *= (m_camera_movement.y > 0) ? -1.f : 1.f;
 				if (pos >= 3 && pos <= 5) m_camera_movement.x *= (m_camera_movement.x < 0) ? -1.f : 1.f;
-				if (pos == 0 || pos == 1 || pos == 7) m_camera_movement.x *= (m_camera_movement.x > 0) ? -1.f : 1.f;*/
+				if (pos == 0 || pos == 1 || pos == 7) m_camera_movement.x *= (m_camera_movement.x > 0) ? -1.f : 1.f;
 				//break;
 			}
 		}
