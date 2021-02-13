@@ -77,11 +77,14 @@ void Renderer::InitCamera()
 
 bool Renderer::InitLights()
 {
-	this->m_light.SetColor(glm::vec3(108.f, 86.f, 64.f));
+	this->m_light.SetColor(glm::vec3(255.f, 230.f, 220.f));
+	this->m_light.SetLightOffset(glm::vec3(0.f, -2.f, 0.f));
 	this->m_light.SetPosition(this->m_camera_position);
 	this->m_light.SetTarget(this->m_camera_target_position);
 	this->m_light.SetConeSize(40, 50);
 	this->m_light.CastShadow(true);
+
+	std::cout << "::" << this->m_light.GetPosition().y << " :: " << this->m_light.GetTarget().y << std::endl; // returns 2, expected -2
 
 	return true;
 }
@@ -308,12 +311,12 @@ void Renderer::UpdateCamera(float dt)
 				if (pos >= 5 && pos <= 7) m_camera_movement.x = (m_camera_movement.x > 0) ? 0 : m_camera_movement.x;
 				if (pos >= 3 && pos <= 5) m_camera_movement.y = (m_camera_movement.y > 0) ? 0 : m_camera_movement.y;
 				if (pos == 0 || pos == 1 || pos == 7) m_camera_movement.y = (m_camera_movement.y < 0) ? 0 : m_camera_movement.y;*/
-				std::cout << pos << ": " << *it << std::endl;
+				//std::cout << pos << ": " << *it << std::endl;
 				//m_camera_movement.x *= -1; m_camera_movement.y *= -1;
-				if (pos >= 1 && pos <= 3) m_camera_movement.y *= (m_camera_movement.y < 0) ? -1.f : 1.f;
+				/*if (pos >= 1 && pos <= 3) m_camera_movement.y *= (m_camera_movement.y < 0) ? -1.f : 1.f;
 				if (pos >= 5 && pos <= 7) m_camera_movement.y *= (m_camera_movement.y > 0) ? -1.f : 1.f;
 				if (pos >= 3 && pos <= 5) m_camera_movement.x *= (m_camera_movement.x < 0) ? -1.f : 1.f;
-				if (pos == 0 || pos == 1 || pos == 7) m_camera_movement.x *= (m_camera_movement.x > 0) ? -1.f : 1.f;
+				if (pos == 0 || pos == 1 || pos == 7) m_camera_movement.x *= (m_camera_movement.x > 0) ? -1.f : 1.f;*/
 				//break;
 			}
 		}
@@ -727,9 +730,9 @@ void Renderer::RenderShadowMaps()
 	}
 }
 
-void Renderer::CameraMoveForward(bool enable)
+void Renderer::CameraMoveForward(bool enable, float factor)
 {
-	m_camera_movement.x = (enable) ? 2 : 0;
+	m_camera_movement.x = (enable) ? 2*factor : 0;
 }
 
 void Renderer::CameraMoveBackWard(bool enable)
@@ -835,7 +838,7 @@ void Renderer::placeObject(bool &init, std::array<const char*, MAP_ASSETS::SIZE_
 
 void Renderer::buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets)
 {
-	//left path
+	// left path
 	this->placeObject(initialized, mapAssets, WALL, glm::vec3(3.f, 0.f, 0.5f), glm::vec3(0.f, 0.f, 0.f));
 	this->placeObject(initialized, mapAssets, WALL, glm::vec3(-3.f, 0.f, 0.5f), glm::vec3(0.f, 0.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_FORK, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f));
@@ -861,18 +864,29 @@ void Renderer::buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::S
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-80.5f, 0.f, -45.5f), glm::vec3(0.f, 180.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_FORK, glm::vec3(-68.75f, 0.f, -67.75f), glm::vec3(0.f, 0.f, 90.f));
 
-	//straight sub-path of left path
+	// straight sub-path of left path
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-68.75f, 5.f, -87.75f), glm::vec3(0.f, 0.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-68.75f, 5.f, -107.75f), glm::vec3(0.f, 0.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-68.75f, 5.f, -127.75f), glm::vec3(0.f, 0.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-41.75f, 5.f, -134.75f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-26.75f, 5.f, -139.75f), glm::vec3(0.f, 180.f, 0.f));
+	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-15.f, 5.f, -162.f), glm::vec3(0.f, 0.f, 0.f));
+	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-26.75f, 5.f, -182.f), glm::vec3(0.f, -90.f, 0.f));
 
-	//right sub-path connecting left with right
+	// final stretch
+	this->placeObject(initialized, mapAssets, CORRIDOR_FORK, glm::vec3(-42.f, 5.f, -194.f), glm::vec3(0.f, -90.f, 0.f));
+	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-62.f, 5.f, -194.f), glm::vec3(0.f, 90.f, 0.f));
+	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-82.f, 5.f, -194.f), glm::vec3(0.f, 90.f, 0.f));
+	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-102.f, 5.f, -194.f), glm::vec3(0.f, 90.f, 0.f));
+	this->placeObject(initialized, mapAssets, WALL, glm::vec3(-112.5f, 5.f, -201.f), glm::vec3(0.f, 90.f, 0.f));
+	this->placeObject(initialized, mapAssets, WALL, glm::vec3(-112.5f, 5.f, -207.f), glm::vec3(0.f, 90.f, 0.f));
+
+	// right sub-path connecting left with right
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-68.75f, -5.f, -87.75f), glm::vec3(0.f, 0.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-42.5f, -5.f, -94.75f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-32.5f, -5.f, -94.75f), glm::vec3(0.f, 90.f, 0.f), glm::vec3(1.f, 1.f, 0.5f));
-	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-17.25f, -3.25f, -99.25f), glm::vec3(-15.f, 180.f, 0.f));
+	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-17.25f, -3.f, -99.25f), glm::vec3(-17.f, 180.f, 0.f));
+	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-5.75f, 0.f, -119.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.5f, 0.1f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-5.75f, 0.f, -121.25f), glm::vec3(0.f, 0.f, 0.f));
 
 	// right path
@@ -893,12 +907,10 @@ void Renderer::buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::S
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(4.f, 0.f, -119.f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_FORK, glm::vec3(-0.75f, 0.f, -141.25f), glm::vec3(0.f, 180.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-0.75f, 0.f, -161.25f), glm::vec3(0.f, 0.f, 0.f));
-
-	// last object (not proeprly rendered)
-	//this->placeObject(initialized, mapAssets, CORRIDOR_FORK, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f));
-
-	//camera_target
-	//this->placeObject(initialized, mapAssets, BEAM, m_camera_target_position, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.5f, 0.5f, 0.5f));
+	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-0.75f, 0.f, -181.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 0.55f));
+	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-12.5f, 2.f, -192.25f), glm::vec3(-17.f, -90.f, 0.f));
+	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-24.75f, 5.f, -199.f), glm::vec3(0.f, 90.f, 0.f), glm::vec3(1.f, 1.5f, 0.1f));
+	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-26.75f, 5.f, -199.f), glm::vec3(0.f, 90.f, 0.f), glm::vec3(1.f, 1.f, 0.75f));
 
 	this->m_world_matrix = glm::mat4(1.f);
 }

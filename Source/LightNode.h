@@ -13,6 +13,7 @@ class LightNode
 	glm::vec3 m_light_position;
 	glm::vec3 m_light_target;
 	glm::vec3 m_light_color;
+	glm::vec3 m_light_offset;
 
 	float m_umbra;
 	float m_penumbra;
@@ -36,11 +37,13 @@ public:
 	void SetColor(const glm::vec3& color);
 	void SetTarget(const glm::vec3& target);
 	void SetConeSize(float umbra, float penumbra);
+	void SetLightOffset(const glm::vec3 offset);
 
 	glm::vec3 GetPosition();
 	glm::vec3 GetTarget();
 	glm::vec3 GetDirection();
 	glm::vec3 GetColor();
+	glm::vec3 GetLightOffset();
 
 	float GetUmbra();
 	float GetPenumbra();

@@ -104,7 +104,7 @@ public:
 	bool										ReloadShaders();
 	void										Render();
 
-	void										CameraMoveForward(bool enable);
+	void										CameraMoveForward(bool enable, float factor);
 	void										CameraMoveBackWard(bool enable);
 	void										CameraMoveLeft(bool enable);
 	void										CameraMoveRight(bool enable);

@@ -70,7 +70,7 @@ void LightNode::SetColor(const glm::vec3& color)
 
 void LightNode::SetPosition(const glm::vec3& pos)
 {
-	m_light_position = pos;
+	m_light_position = pos - GetLightOffset();
 	m_light_direction = glm::normalize(m_light_target - m_light_position);
 	m_view_matrix = glm::lookAt(m_light_position, m_light_target, glm::vec3(0, 1, 0));
 	m_view_inverse_matrix = glm::inverse(m_view_matrix);
@@ -78,7 +78,7 @@ void LightNode::SetPosition(const glm::vec3& pos)
 
 void LightNode::SetTarget(const glm::vec3& target)
 {
-	m_light_target = target;
+	m_light_target = target - GetLightOffset();
 	m_light_direction = glm::normalize(m_light_target - m_light_position);
 	m_view_matrix = glm::lookAt(m_light_position, m_light_target, glm::vec3(0, 1, 0));
 	m_view_inverse_matrix = glm::inverse(m_view_matrix);
@@ -95,6 +95,11 @@ void LightNode::SetConeSize(float umbra, float penumbra)
 	float h = near_clipping_range * glm::tan(glm::radians(m_penumbra * 0.5f));
 	m_projection_matrix = glm::frustum(-h, h, -h, h, near_clipping_range, far_clipping_range);
 	m_projection_inverse_matrix = glm::inverse(m_projection_matrix);
+}
+
+void LightNode::SetLightOffset(const glm::vec3 offset)
+{
+	m_light_offset = offset;
 }
 
 glm::vec3 LightNode::GetPosition()
@@ -115,6 +120,11 @@ glm::vec3 LightNode::GetDirection()
 glm::vec3 LightNode::GetColor()
 {
 	return m_light_color;
+}
+
+glm::vec3 LightNode::GetLightOffset()
+{
+	return m_light_offset;
 }
 
 float LightNode::GetUmbra()
