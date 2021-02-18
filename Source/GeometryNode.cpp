@@ -24,6 +24,18 @@ GeometryNode::~GeometryNode()
 	glDeleteBuffers(1, &m_vbo_texcoords);
 }
 
+glm::vec3 GeometryNode::GetPosition() 
+{
+	return position;
+}
+
+void GeometryNode::SetPosition(glm::vec3 p)
+{
+	position.x = p.x;
+	position.y = p.y;
+	position.z = p.z;
+}
+
 void GeometryNode::Init(GeometricMesh* mesh)
 {
 	glGenVertexArrays(1, &m_vao);

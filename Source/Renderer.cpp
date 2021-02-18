@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
+#include <math.h>
 
 // RENDERER
 Renderer::Renderer()
@@ -82,7 +83,7 @@ bool Renderer::InitLights()
 	this->m_light.SetPosition(this->m_camera_position);
 	this->m_light.SetTarget(this->m_camera_target_position);
 	this->m_light.SetConeSize(40, 50);
-	this->m_light.CastShadow(true);
+	this->m_light.CastShadow(false);
 
 	return true;
 }
@@ -295,9 +296,11 @@ void Renderer::UpdateCamera(float dt)
 	glm::vec3 direction = glm::normalize(m_camera_target_position - m_camera_position);
 	std::vector<float> isectDst;
 
-	float distance = 15.f;
+	float distance = 17.5f;
 	for (auto& node : this->m_collidables_nodes)
 	{
+		if (calculateDistance(m_camera_position, node->GetPosition()) > distance) continue;
+		std::cout << "checking with " << node->GetPosition().x << " " << node->GetPosition().y << " " << node->GetPosition().z << std::endl;
 		float_t isectT = 0.f;
 		int32_t primID = -1;
 		isectDst.clear();
@@ -305,10 +308,6 @@ void Renderer::UpdateCamera(float dt)
 		for (auto it = isectDst.begin(); it != isectDst.end(); ++it) {
 			if (*it < distance) {
 				int pos = it - isectDst.begin();
-				/*if (pos >= 1 && pos <= 3) m_camera_movement.x = (m_camera_movement.x < 0) ? 0 : m_camera_movement.x;
-				if (pos >= 5 && pos <= 7) m_camera_movement.x = (m_camera_movement.x > 0) ? 0 : m_camera_movement.x;
-				if (pos >= 3 && pos <= 5) m_camera_movement.y = (m_camera_movement.y > 0) ? 0 : m_camera_movement.y;
-				if (pos == 0 || pos == 1 || pos == 7) m_camera_movement.y = (m_camera_movement.y < 0) ? 0 : m_camera_movement.y;*/
 				//std::cout << pos << ": " << *it << std::endl;
 				//m_camera_movement.x *= -1; m_camera_movement.y *= -1;
 				if (pos >= 1 && pos <= 3) m_camera_movement.y *= (m_camera_movement.y < 0) ? -1.f : 1.f;
@@ -824,6 +823,7 @@ void Renderer::placeObject(bool &init, std::array<const char*, MAP_ASSETS::SIZE_
 			node->SetType(asset);
 			temp = node;
 		}
+		temp->SetPosition(move);
 		temp->model_matrix = Renderer::move(*temp, move) * Renderer::rotate(*temp, rotate) * Renderer::scale(*temp, scale);
 		temp->m_aabb.center = glm::vec3(temp->model_matrix * glm::vec4(temp->m_aabb.center, 1.f));
 		delete mesh;
@@ -949,4 +949,9 @@ void Renderer::collisionDetection(CollidableNode* node)
 			std::cout << "we hit something else" << std::endl;
 			break;
 	}
+}
+
+float Renderer::calculateDistance(glm::vec3 u, glm::vec3 v) 
+{
+	return sqrt(pow(u.x - v.x, 2) + pow(u.y - v.y, 2) + pow(u.z - v.z, 2));
 }
