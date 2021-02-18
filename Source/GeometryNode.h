@@ -8,11 +8,16 @@
 
 class GeometryNode
 {
+private:
+	glm::vec3 position;
 public:
 	GeometryNode();
 	virtual ~GeometryNode();
 
 	virtual void Init(class GeometricMesh* mesh);
+
+	glm::vec3 GetPosition();
+	void SetPosition(glm::vec3 p);
 
 	struct Objects
 	{

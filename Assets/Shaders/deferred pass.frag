@@ -246,11 +246,11 @@ void main(void)
 	// check if we have shadows
 	float shadow_value = (uniform_cast_shadows == 1) ? shadow(pos_wcs.xyz) : 1.0;
 
-	/*
+	
 	vec3 brdf = blinn_phong(surfToEye, surfToLight, pos_wcs.xyz,
 		normal_wcs.xyz,
 		albedo.xyz, mask,
-		vec3(pos_wcs.a, normal_wcs.a, albedo.a));*/
+		vec3(pos_wcs.a, normal_wcs.a, albedo.a));
 
 	float spotEffect = 1.0;//compute_spotlight(surfToLight);
 
@@ -260,4 +260,10 @@ void main(void)
 		normal_wcs.xyz,
 		albedo.xyz, mask,
 		vec3(pos_wcs.a, normal_wcs.a, albedo.a)), 1.0);
+
+	/*out_color = 0.8 * vec4(shadow_value * brdf * spotEffect, 1.0) +
+				0.2 * vec4(cook_torrance(surfToEye, surfToLight, pos_wcs.xyz,
+						normal_wcs.xyz,
+						albedo.xyz, mask,
+						vec3(pos_wcs.a, normal_wcs.a, albedo.a)), 1.0);*/
 }

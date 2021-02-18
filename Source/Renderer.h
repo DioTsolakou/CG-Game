@@ -116,6 +116,7 @@ public:
 	glm::mat4									scale(GeometryNode& object, glm::vec3 scale);
 	void										buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets);
 	void										collisionDetection(CollidableNode* node);
+	float										calculateDistance(glm::vec3 u, glm::vec3);
 };
 
 #endif
