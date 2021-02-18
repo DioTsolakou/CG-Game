@@ -84,8 +84,6 @@ bool Renderer::InitLights()
 	this->m_light.SetConeSize(40, 50);
 	this->m_light.CastShadow(true);
 
-	std::cout << "::" << this->m_light.GetPosition().y << " :: " << this->m_light.GetTarget().y << std::endl; // returns 2, expected -2
-
 	return true;
 }
 
@@ -252,8 +250,8 @@ bool Renderer::InitGeometricMeshes()
 		"Assets/Corridor/Corridor_Right.obj",
 		"Assets/Corridor/CH-Corridor_Right.obj",
 		
-		//"Assets/Iris/Iris.obj",
-		//"Assets/Iris/CH-Iris.obj",
+		"Assets/Iris/Iris.obj",
+		"Assets/Iris/CH-Iris.obj",
 
 		"Assets/Pipe/Pipe.obj",
 		"Assets/Pipe/CH-Pipe.obj",
@@ -841,7 +839,11 @@ void Renderer::buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::S
 	// left path
 	this->placeObject(initialized, mapAssets, WALL, glm::vec3(3.f, 0.f, 0.5f), glm::vec3(0.f, 0.f, 0.f));
 	this->placeObject(initialized, mapAssets, WALL, glm::vec3(-3.f, 0.f, 0.5f), glm::vec3(0.f, 0.f, 0.f));
+
 	this->placeObject(initialized, mapAssets, CORRIDOR_FORK, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f));
+	this->placeObject(initialized, mapAssets, WALL, glm::vec3(-9.f, 0.f, -19.5f), glm::vec3(0.f, 0.f, 0.f));
+	this->placeObject(initialized, mapAssets, WALL, glm::vec3(9.f, 0.f, -19.5f), glm::vec3(0.f, 0.f, 0.f));
+
 	this->placeObject(initialized, mapAssets, PIPE, glm::vec3(0.f, 0.f, -11.f), glm::vec3(90.f, 0.f, 0.f));
 	this->placeObject(initialized, mapAssets, BEAM, glm::vec3(0.f, 0.f, -18.f), glm::vec3(0.f, 0.f, 90.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_LEFT, glm::vec3(-5.f, 0.f, -20.f), glm::vec3(0.f, 0.f, 0.f));
@@ -856,6 +858,14 @@ void Renderer::buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::S
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-129.5f, 0.f, 27.f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-149.5f, 0.f, 27.f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-176.5f, 0.f, 22.25f), glm::vec3(0.f, 90.f, 0.f));
+
+	this->placeObject(initialized, mapAssets, WALL, glm::vec3(-179.05f, 0.f, 0.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.85f, 1.f, 1.f));
+	this->placeObject(initialized, mapAssets, IRIS, glm::vec3(-179.05f, 3.25f, 0.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.2f, 1.2f, 1.f));
+	this->placeObject(initialized, mapAssets, IRIS, glm::vec3(-179.05f, -3.25f, 0.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.2f, 1.2f, 1.f));
+	this->placeObject(initialized, mapAssets, WALL, glm::vec3(-173.95f, 0.f, 0.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.85f, 1.f, 1.f));
+	this->placeObject(initialized, mapAssets, IRIS, glm::vec3(-173.95f, 3.25f, 0.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.2f, 1.2f, 1.f));
+	this->placeObject(initialized, mapAssets, IRIS, glm::vec3(-173.95f, -3.25f, 0.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.2f, 1.2f, 1.f));
+
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-176.5f, 0.f, 0.25f), glm::vec3(0.f, 0.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-149.5f, 0.f, -6.75f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-129.5f, 0.f, -6.75f), glm::vec3(0.f, 90.f, 0.f));
@@ -863,6 +873,12 @@ void Renderer::buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::S
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-102.75f, 0.f, -33.75f), glm::vec3(0.f, 0.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-80.5f, 0.f, -45.5f), glm::vec3(0.f, 180.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_FORK, glm::vec3(-68.75f, 0.f, -67.75f), glm::vec3(0.f, 0.f, 90.f));
+	this->placeObject(initialized, mapAssets, WALL, glm::vec3(-68.75f, 2.75f, -87.25f), glm::vec3(0.f, 0.f, 90.f), glm::vec3(0.85f, 1.f, 1.f));
+	this->placeObject(initialized, mapAssets, IRIS, glm::vec3(-65.5f, 2.75f, -87.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.2f, 1.2f, 1.f));
+	this->placeObject(initialized, mapAssets, IRIS, glm::vec3(-71.75f, 2.75f, -87.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.2f, 1.2f, 1.f));
+	this->placeObject(initialized, mapAssets, WALL, glm::vec3(-68.75f, -2.75f, -87.25f), glm::vec3(0.f, 0.f, 90.f), glm::vec3(0.85f, 1.f, 1.f));
+	this->placeObject(initialized, mapAssets, IRIS, glm::vec3(-65.5f, -2.75f, -87.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.2f, 1.2f, 1.f));
+	this->placeObject(initialized, mapAssets, IRIS, glm::vec3(-71.75f, -2.75f, -87.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.2f, 1.2f, 1.f));
 
 	// straight sub-path of left path
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-68.75f, 5.f, -87.75f), glm::vec3(0.f, 0.f, 0.f));
@@ -875,6 +891,8 @@ void Renderer::buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::S
 
 	// final stretch
 	this->placeObject(initialized, mapAssets, CORRIDOR_FORK, glm::vec3(-42.f, 5.f, -194.f), glm::vec3(0.f, -90.f, 0.f));
+	this->placeObject(initialized, mapAssets, PIPE, glm::vec3(-38.f, 5.f, -199.f), glm::vec3(90.f, 0.f, 0.f));
+	this->placeObject(initialized, mapAssets, BEAM, glm::vec3(-31.f, 5.f, -199.f), glm::vec3(90.f, 0.f, 90.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-62.f, 5.f, -194.f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-82.f, 5.f, -194.f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-102.f, 5.f, -194.f), glm::vec3(0.f, 90.f, 0.f));
@@ -886,7 +904,7 @@ void Renderer::buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::S
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-42.5f, -5.f, -94.75f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-32.5f, -5.f, -94.75f), glm::vec3(0.f, 90.f, 0.f), glm::vec3(1.f, 1.f, 0.5f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-17.25f, -3.f, -99.25f), glm::vec3(-17.f, 180.f, 0.f));
-	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-5.75f, 0.f, -119.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.5f, 0.1f));
+	this->placeObject(initialized, mapAssets, WALL, glm::vec3(-5.75f, 3.f, -120.75f), glm::vec3(0.f, 0.f, 90.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-5.75f, 0.f, -121.25f), glm::vec3(0.f, 0.f, 0.f));
 
 	// right path
@@ -909,7 +927,7 @@ void Renderer::buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::S
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-0.75f, 0.f, -161.25f), glm::vec3(0.f, 0.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-0.75f, 0.f, -181.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 0.55f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-12.5f, 2.f, -192.25f), glm::vec3(-17.f, -90.f, 0.f));
-	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-24.75f, 5.f, -199.f), glm::vec3(0.f, 90.f, 0.f), glm::vec3(1.f, 1.5f, 0.1f));
+	this->placeObject(initialized, mapAssets, WALL, glm::vec3(-15.f, 8.f, -209.f), glm::vec3(90.f, 0.f, 90.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-26.75f, 5.f, -199.f), glm::vec3(0.f, 90.f, 0.f), glm::vec3(1.f, 1.f, 0.75f));
 
 	this->m_world_matrix = glm::mat4(1.f);
