@@ -64,11 +64,12 @@ protected:
 	void RenderGeometry();
 	void RenderDeferredShading();
 	void RenderStaticGeometry();
+	void RenderCurves();
 	void RenderCollidableGeometry();
+	void PassCollidableToShader(CollidableNode& node, glm::mat4 proj);
 	void RenderShadowMaps();
 	void RenderPostProcess();
 	void placeObject(bool& init, std::array<const char*, MAP_ASSETS::SIZE_ALL>& map_assets, MAP_ASSETS asset, glm::vec3 move, glm::vec3 rotate, glm::vec3 scale = glm::vec3(1.f, 1.f, 1.f));
-	void placeLight(glm::vec3 move);
 
 	std::vector<GeometryNode*> m_nodes;
 	std::vector<CollidableNode*> m_collidables_nodes;

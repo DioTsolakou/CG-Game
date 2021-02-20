@@ -300,7 +300,7 @@ void Renderer::UpdateCamera(float dt)
 	for (auto& node : this->m_collidables_nodes)
 	{
 		if (calculateDistance(m_camera_position, node->GetPosition()) > distance) continue;
-		std::cout << "checking with " << node->GetPosition().x << " " << node->GetPosition().y << " " << node->GetPosition().z << std::endl;
+		//std::cout << "checking with " << node->GetPosition().x << " " << node->GetPosition().y << " " << node->GetPosition().z << std::endl;
 		float_t isectT = 0.f;
 		int32_t primID = -1;
 		isectDst.clear();
@@ -419,9 +419,6 @@ void Renderer::RenderStaticGeometry()
 {
 	glm::mat4 proj = m_projection_matrix * m_view_matrix * m_world_matrix;
 
-	/*glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
-
 	for (auto& node : this->m_nodes)
 	{
 		glBindVertexArray(node->m_vao);
@@ -473,106 +470,97 @@ void Renderer::RenderStaticGeometry()
 
 		glBindVertexArray(0);
 	}
-
-	//glDisable(GL_BLEND);
 }
 
-//bool check = true;
-//int j = 0;
+void Renderer::RenderCurves()
+{
+	glm::mat4 proj = m_projection_matrix * m_view_matrix * m_world_matrix;
+
+	for (int i = 0; i < this->m_curve_positions.size(); i++)
+	{
+		auto& node = this->m_collidables_nodes.at(this->m_curve_positions.at(i));
+		PassCollidableToShader(*node, proj);
+	}
+}
+
 void Renderer::RenderCollidableGeometry()
 {
 	glm::mat4 proj = m_projection_matrix * m_view_matrix * m_world_matrix;
 
 	glm::vec3 camera_dir = normalize(m_camera_target_position - m_camera_position);
 
-	//glEnable(GL_BLEND);
+	glEnable(GL_BLEND);
 	glBlendFunc(GL_ZERO, GL_ONE);
 
 	for (auto& node : this->m_collidables_nodes)
 	{
-		glEnable(GL_BLEND);
-		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
 		if (node->GetType() == CORRIDOR_CURVE) {
-			glDisable(GL_BLEND);
-			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+			continue;
 		}
-
-		float_t isectT = 0.f;
-		int32_t primID = -1;
-		int32_t totalRenderedPrims = 0;
-
-		//if (check) {
-		//	if (node->intersectRays(m_camera_position, camera_dir, m_world_matrix, isectT, primID)) {
-		//		if (isectT > 0.f) {
-		//			check = false;
-		//			collisionDetection(node);
-		//			//continue;
-		//		}
-		//	}		
-		//}
-		//j++;
-		//if (j == this->m_collidables_nodes.size()) {check = true; j = 0;}
-
-		//if (node - this->m_collidables_nodes.begin() == this->m_collidables_nodes.end() - 1) check = true;
-		//node->intersectRay(m_camera_position, camera_dir, m_world_matrix, isectT, primID);
-
-		glBindVertexArray(node->m_vao);
-
-		m_geometry_program.loadMat4("uniform_projection_matrix", proj * node->app_model_matrix);
-		m_geometry_program.loadMat4("uniform_normal_matrix", glm::transpose(glm::inverse(m_world_matrix * node->app_model_matrix)));
-		m_geometry_program.loadMat4("uniform_world_matrix", m_world_matrix * node->app_model_matrix);
-		m_geometry_program.loadFloat("uniform_time", m_continous_time);
-
-		
-		for (int j = 0; j < node->parts.size(); ++j)
-		{
-			m_geometry_program.loadVec3("uniform_diffuse", node->parts[j].diffuse);
-			m_geometry_program.loadVec3("uniform_ambient", node->parts[j].ambient);
-			m_geometry_program.loadVec3("uniform_specular", node->parts[j].specular);
-			m_geometry_program.loadFloat("uniform_shininess", node->parts[j].shininess);
-			m_geometry_program.loadInt("uniform_has_tex_diffuse", (node->parts[j].diffuse_textureID > 0) ? 1 : 0);
-			m_geometry_program.loadInt("uniform_has_tex_mask", (node->parts[j].mask_textureID > 0) ? 1 : 0);
-			m_geometry_program.loadInt("uniform_has_tex_emissive", (node->parts[j].emissive_textureID > 0) ? 1 : 0);
-			m_geometry_program.loadInt("uniform_has_tex_normal", (node->parts[j].bump_textureID > 0 || node->parts[j].normal_textureID > 0) ? 1 : 0);
-			m_geometry_program.loadInt("uniform_is_tex_bumb", (node->parts[j].bump_textureID > 0) ? 1 : 0);
-			m_geometry_program.loadInt("uniform_prim_id", primID - totalRenderedPrims);
-
-			glActiveTexture(GL_TEXTURE0);
-			m_geometry_program.loadInt("uniform_tex_diffuse", 0);
-			glBindTexture(GL_TEXTURE_2D, node->parts[j].diffuse_textureID);
-
-			if (node->parts[j].mask_textureID > 0)
-			{
-				glActiveTexture(GL_TEXTURE1);
-				m_geometry_program.loadInt("uniform_tex_mask", 1);
-				glBindTexture(GL_TEXTURE_2D, node->parts[j].mask_textureID);
-			}
-
-			if ((node->parts[j].bump_textureID > 0 || node->parts[j].normal_textureID > 0))
-			{
-				glActiveTexture(GL_TEXTURE2);
-				m_geometry_program.loadInt("uniform_tex_normal", 2);
-				glBindTexture(GL_TEXTURE_2D, node->parts[j].bump_textureID > 0 ?
-					node->parts[j].bump_textureID : node->parts[j].normal_textureID);
-			}
-
-			if (node->parts[j].emissive_textureID > 0)
-			{
-				glActiveTexture(GL_TEXTURE3);
-				m_geometry_program.loadInt("uniform_tex_emissive", 3);
-				glBindTexture(GL_TEXTURE_2D, node->parts[j].emissive_textureID);
-			}
-
-			glDrawArrays(GL_TRIANGLES, node->parts[j].start_offset, node->parts[j].count);
-			totalRenderedPrims += node->parts[j].count;
-			
-		}
-
-		glBindVertexArray(0);
+		PassCollidableToShader(*node, proj);
 	}
 
 	glDisable(GL_BLEND);
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+}
+
+void Renderer::PassCollidableToShader(CollidableNode& node, glm::mat4 proj)
+{
+	int32_t primID = -1;
+	int32_t totalRenderedPrims = 0;
+
+	glBindVertexArray(node.m_vao);
+
+	m_geometry_program.loadMat4("uniform_projection_matrix", proj * node.app_model_matrix);
+	m_geometry_program.loadMat4("uniform_normal_matrix", glm::transpose(glm::inverse(m_world_matrix * node.app_model_matrix)));
+	m_geometry_program.loadMat4("uniform_world_matrix", m_world_matrix * node.app_model_matrix);
+	m_geometry_program.loadFloat("uniform_time", m_continous_time);
+
+
+	for (int j = 0; j < node.parts.size(); ++j)
+	{
+		m_geometry_program.loadVec3("uniform_diffuse", node.parts[j].diffuse);
+		m_geometry_program.loadVec3("uniform_ambient", node.parts[j].ambient);
+		m_geometry_program.loadVec3("uniform_specular", node.parts[j].specular);
+		m_geometry_program.loadFloat("uniform_shininess", node.parts[j].shininess);
+		m_geometry_program.loadInt("uniform_has_tex_diffuse", (node.parts[j].diffuse_textureID > 0) ? 1 : 0);
+		m_geometry_program.loadInt("uniform_has_tex_mask", (node.parts[j].mask_textureID > 0) ? 1 : 0);
+		m_geometry_program.loadInt("uniform_has_tex_emissive", (node.parts[j].emissive_textureID > 0) ? 1 : 0);
+		m_geometry_program.loadInt("uniform_has_tex_normal", (node.parts[j].bump_textureID > 0 || node.parts[j].normal_textureID > 0) ? 1 : 0);
+		m_geometry_program.loadInt("uniform_is_tex_bumb", (node.parts[j].bump_textureID > 0) ? 1 : 0);
+		m_geometry_program.loadInt("uniform_prim_id", primID - totalRenderedPrims);
+
+		glActiveTexture(GL_TEXTURE0);
+		m_geometry_program.loadInt("uniform_tex_diffuse", 0);
+		glBindTexture(GL_TEXTURE_2D, node.parts[j].diffuse_textureID);
+
+		if (node.parts[j].mask_textureID > 0)
+		{
+			glActiveTexture(GL_TEXTURE1);
+			m_geometry_program.loadInt("uniform_tex_mask", 1);
+			glBindTexture(GL_TEXTURE_2D, node.parts[j].mask_textureID);
+		}
+
+		if ((node.parts[j].bump_textureID > 0 || node.parts[j].normal_textureID > 0))
+		{
+			glActiveTexture(GL_TEXTURE2);
+			m_geometry_program.loadInt("uniform_tex_normal", 2);
+			glBindTexture(GL_TEXTURE_2D, node.parts[j].bump_textureID > 0 ?
+				node.parts[j].bump_textureID : node.parts[j].normal_textureID);
+		}
+
+		if (node.parts[j].emissive_textureID > 0)
+		{
+			glActiveTexture(GL_TEXTURE3);
+			m_geometry_program.loadInt("uniform_tex_emissive", 3);
+			glBindTexture(GL_TEXTURE_2D, node.parts[j].emissive_textureID);
+		}
+
+		glDrawArrays(GL_TRIANGLES, node.parts[j].start_offset, node.parts[j].count);
+		totalRenderedPrims += node.parts[j].count;
+
+	}
+
+	glBindVertexArray(0);
 }
 
 void Renderer::RenderDeferredShading()
@@ -663,6 +651,7 @@ void Renderer::RenderGeometry()
 
 	m_geometry_program.Bind();
 	RenderStaticGeometry();
+	RenderCurves();
 	RenderCollidableGeometry();
 
 	m_geometry_program.Unbind();
@@ -852,12 +841,22 @@ void Renderer::buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::S
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-42.5f, 0.f, -20.f), glm::vec3(0.f, 0.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-42.5f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f));
 	this->placeObject(initialized, mapAssets, CANNON_MOUNT, glm::vec3(-42.5f, 5.f, -20.f), glm::vec3(0.f, 0.f, 0.f));
-	this->placeObject(initialized, mapAssets, CANNON, glm::vec3(-43.2f, 3.7f, -23.5f), glm::vec3(0.f, 180.f, 0.f));
-	this->placeObject(initialized, mapAssets, CANNON, glm::vec3(-41.8f, 3.7f, -23.5f), glm::vec3(0.f, 180.f, 0.f));
+	this->placeObject(initialized, mapAssets, CANNON, glm::vec3(-43.2f, 3.45f, -23.5f), glm::vec3(15.f, 180.f, 0.f));
+	this->placeObject(initialized, mapAssets, CANNON, glm::vec3(-41.8f, 3.45f, -23.5f), glm::vec3(15.f, 180.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-54.25f, 0.f, 22.25f), glm::vec3(0.f, 180.f, 0.f)); // corridor curve is 11.75m in X axis and 22.25m in Z axis
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-69.5f, 0.f, 27.f), glm::vec3(0.f, 90.f, 0.f));
+	this->placeObject(initialized, mapAssets, WALL, glm::vec3(-69.5f, -2.f, 17.f), glm::vec3(90.f, 0.f, 0.f));
+	this->placeObject(initialized, mapAssets, CANNON_MOUNT, glm::vec3(-69.5f, 0.f, 14.f), glm::vec3(180.f, 90.f, 0.f));
+	this->placeObject(initialized, mapAssets, CANNON, glm::vec3(-67.75f, -0.5f, 12.95f), glm::vec3(0.f, 90.f, 0.f));
+	this->placeObject(initialized, mapAssets, CANNON, glm::vec3(-67.75f, -0.5f, 11.55f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-89.5f, 0.f, 27.f), glm::vec3(0.f, 90.f, 0.f));
+	this->placeObject(initialized, mapAssets, CANNON_MOUNT, glm::vec3(-89.5f, 5.f, 17.f), glm::vec3(0.f, 90.f, 0.f));
+	this->placeObject(initialized, mapAssets, CANNON, glm::vec3(-87.5f, 3.45f, 15.95f), glm::vec3(15.f, 90.f, 0.f));
+	this->placeObject(initialized, mapAssets, CANNON, glm::vec3(-87.5f, 3.45f, 14.55f), glm::vec3(15.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-109.5f, 0.f, 27.f), glm::vec3(0.f, 90.f, 0.f));
+	this->placeObject(initialized, mapAssets, CANNON_MOUNT, glm::vec3(-109.5f, -3.f, 17.f), glm::vec3(180.f, 90.f, 0.f));
+	this->placeObject(initialized, mapAssets, CANNON, glm::vec3(-106.f, -2.25f, 15.95f), glm::vec3(-15.f, 90.f, 0.f));
+	this->placeObject(initialized, mapAssets, CANNON, glm::vec3(-106.f, -2.25f, 14.55f), glm::vec3(-15.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-129.5f, 0.f, 27.f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-149.5f, 0.f, 27.f), glm::vec3(0.f, 90.f, 0.f));
 	this->placeObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-176.5f, 0.f, 22.25f), glm::vec3(0.f, 90.f, 0.f));
