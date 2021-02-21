@@ -11,6 +11,8 @@ GeometryNode::GeometryNode()
 	m_vbo_texcoords = 0;
 	m_vbo_tangents = 0;
 	m_vbo_bitangents = 0;
+
+	renderable = true;
 }
 
 GeometryNode::~GeometryNode()
@@ -22,18 +24,6 @@ GeometryNode::~GeometryNode()
 	glDeleteBuffers(1, &m_vbo_tangents);
 	glDeleteBuffers(1, &m_vbo_bitangents);
 	glDeleteBuffers(1, &m_vbo_texcoords);
-}
-
-glm::vec3 GeometryNode::GetPosition() 
-{
-	return position;
-}
-
-void GeometryNode::SetPosition(glm::vec3 p)
-{
-	position.x = p.x;
-	position.y = p.y;
-	position.z = p.z;
 }
 
 void GeometryNode::Init(GeometricMesh* mesh)

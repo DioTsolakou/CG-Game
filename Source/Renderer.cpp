@@ -310,10 +310,10 @@ void Renderer::UpdateCamera(float dt)
 				int pos = it - isectDst.begin();
 				//std::cout << pos << ": " << *it << std::endl;
 				//m_camera_movement.x *= -1; m_camera_movement.y *= -1;
-				/*if (pos >= 1 && pos <= 3) m_camera_movement.y *= (m_camera_movement.y < 0) ? -1.f : 1.f;
+				if (pos >= 1 && pos <= 3) m_camera_movement.y *= (m_camera_movement.y < 0) ? -1.f : 1.f;
 				if (pos >= 5 && pos <= 7) m_camera_movement.y *= (m_camera_movement.y > 0) ? -1.f : 1.f;
 				if (pos >= 3 && pos <= 5) m_camera_movement.x *= (m_camera_movement.x < 0) ? -1.f : 1.f;
-				if (pos == 0 || pos == 1 || pos == 7) m_camera_movement.x *= (m_camera_movement.x > 0) ? -1.f : 1.f;*/
+				if (pos == 0 || pos == 1 || pos == 7) m_camera_movement.x *= (m_camera_movement.x > 0) ? -1.f : 1.f;
 				//break;
 			}
 		}
@@ -421,6 +421,7 @@ void Renderer::RenderStaticGeometry()
 
 	for (auto& node : this->m_nodes)
 	{
+		if (!node->GetRenderable()) continue;
 		glBindVertexArray(node->m_vao);
 
 		m_geometry_program.loadMat4("uniform_projection_matrix", proj * node->app_model_matrix);
@@ -479,6 +480,7 @@ void Renderer::RenderCurves()
 	for (int i = 0; i < this->m_curve_positions.size(); i++)
 	{
 		auto& node = this->m_collidables_nodes.at(this->m_curve_positions.at(i));
+		if (!node->GetRenderable()) continue;
 		PassCollidableToShader(*node, proj);
 	}
 }
@@ -494,6 +496,7 @@ void Renderer::RenderCollidableGeometry()
 
 	for (auto& node : this->m_collidables_nodes)
 	{
+		if (!node->GetRenderable()) continue;
 		if (node->GetType() == CORRIDOR_CURVE) {
 			continue;
 		}
@@ -979,4 +982,20 @@ void Renderer::collisionDetection(CollidableNode* node)
 float Renderer::calculateDistance(glm::vec3 u, glm::vec3 v) 
 {
 	return sqrt(pow(u.x - v.x, 2) + pow(u.y - v.y, 2) + pow(u.z - v.z, 2));
+}
+
+void Renderer::Shoot()
+{
+	for (auto& node : this->m_collidables_nodes)
+	{
+		if (node->GetType() != MAP_ASSETS::CH_IRIS || node->GetType() != MAP_ASSETS::CH_CANNON)
+			continue;
+		float_t isectT = 0.f;
+		int32_t primID = -1;
+		if (node->intersectRay(m_camera_position, m_camera_target_position, m_world_matrix, isectT, primID))
+		{
+			node->SetRenderable(false);
+			break;
+		}
+	}
 }

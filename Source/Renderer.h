@@ -118,6 +118,7 @@ public:
 	void										buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets);
 	void										collisionDetection(CollidableNode* node);
 	float										calculateDistance(glm::vec3 u, glm::vec3);
+	void										Shoot();
 };
 
 #endif
