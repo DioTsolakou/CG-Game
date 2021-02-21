@@ -175,11 +175,7 @@ void mouseInput(bool &mouse_button_pressed, bool &right_mouse_button_pressed, gl
 		{
 			// to do : call function to shoot
 			renderer->Shoot();
-
-			int x = event.button.x;
-			int y = event.button.y;
 			mouse_button_pressed = (event.type == SDL_MOUSEBUTTONDOWN);
-			prev_mouse_position = glm::vec2(x, y);
 		}
 		else if (event.button.button == SDL_BUTTON_RIGHT)
 		{
