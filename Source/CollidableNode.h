@@ -18,8 +18,6 @@ public:
     //bool intersectRays(const glm::vec3& pOrigin, const glm::vec3& pDir, const glm::mat4& pWorldMatrix, float& pIsectDist, int32_t& pPrimID, float pTmax = 1.e+15f, float pTmin = 0.f);
     std::vector<float> calculateCameraCollision(const glm::vec3& pOrigin, const glm::vec3& pDir, const glm::mat4& pWorldMatrix, float& pIsectDist, int32_t& pPrimID, float pTmax = 1.e+15f, float pTmin = 0.f);
     bool intersectRay(const glm::vec3& pOrigin, const glm::vec3& pDir, const glm::mat4& pWorldMatrix, float& pIsectDist, int32_t& pPrimID, float pTmax = 1.e+15f, float pTmin = 0.f, float angleX = 0.f, float angleY = 0.f);
-    int GetType() {return type;}
-    void SetType(int t) {type = t;}
 
 protected:
 
@@ -28,7 +26,6 @@ protected:
 private:
 
     typedef GeometryNode super;
-    int type;
 
     struct triangle { glm::vec3 v0, v1, v2; };
     std::vector<float> intersectionDistance;

@@ -9,15 +9,26 @@
 class GeometryNode
 {
 private:
+	int type;
 	glm::vec3 position;
+	bool renderable;
 public:
 	GeometryNode();
 	virtual ~GeometryNode();
 
 	virtual void Init(class GeometricMesh* mesh);
 
-	glm::vec3 GetPosition();
-	void SetPosition(glm::vec3 p);
+	int GetType() { return type; }
+	void SetType(int t) { type = t; }
+	glm::vec3 GetPosition() { return position; }
+	void SetPosition(glm::vec3 p) 
+	{
+		position.x = p.x;
+		position.y = p.y;
+		position.z = p.z;
+	}
+	int GetRenderable() { return renderable; }
+	void SetRenderable(bool r) { renderable = r; }
 
 	struct Objects
 	{
