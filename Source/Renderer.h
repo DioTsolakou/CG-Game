@@ -51,6 +51,7 @@ protected:
 		WALL,
 		CH_WALL,
 		CORRIDOR_CURVE,
+		CH_CORRIDOR_CURVE,
 		SIZE_ALL
 	};
 
@@ -69,7 +70,7 @@ protected:
 	void PassCollidableToShader(CollidableNode& node, glm::mat4 proj);
 	void RenderShadowMaps();
 	void RenderPostProcess();
-	void placeObject(bool& init, std::array<const char*, MAP_ASSETS::SIZE_ALL>& map_assets, MAP_ASSETS asset, glm::vec3 move, glm::vec3 rotate, glm::vec3 scale = glm::vec3(1.f, 1.f, 1.f));
+	void PlaceObject(bool& init, std::array<const char*, MAP_ASSETS::SIZE_ALL>& map_assets, MAP_ASSETS asset, glm::vec3 move, glm::vec3 rotate, glm::vec3 scale = glm::vec3(1.f, 1.f, 1.f));
 
 	std::vector<GeometryNode*> m_nodes;
 	std::vector<CollidableNode*> m_collidables_nodes;
@@ -112,12 +113,12 @@ public:
 	void										CameraLook(glm::vec2 lookDir);
 	void										CameraRollLeft(bool enable);
 	void										CameraRollRight(bool enable);
-	glm::mat4									move(GeometryNode& object, glm::vec3 movement);
-	glm::mat4									rotate(GeometryNode& object, glm::vec3 rotation);
-	glm::mat4									scale(GeometryNode& object, glm::vec3 scale);
-	void										buildMap(bool &initialized, std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets);
-	void										collisionDetection(CollidableNode* node);
-	float										calculateDistance(glm::vec3 u, glm::vec3);
+	glm::mat4									Move(GeometryNode& object, glm::vec3 movement);
+	glm::mat4									Rotate(GeometryNode& object, glm::vec3 rotation);
+	glm::mat4									Scale(GeometryNode& object, glm::vec3 scale);
+	void										BuildMap(bool &initialized, std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets);
+	void										CollisionDetection(CollidableNode* node);
+	float										CalculateDistance(glm::vec3 u, glm::vec3);
 	void										Shoot();
 };
 

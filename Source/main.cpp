@@ -174,6 +174,7 @@ void mouseInput(bool &mouse_button_pressed, bool &right_mouse_button_pressed, gl
 		if (event.button.button == SDL_BUTTON_LEFT)
 		{
 			// to do : call function to shoot
+			renderer->Shoot();
 
 			int x = event.button.x;
 			int y = event.button.y;
