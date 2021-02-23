@@ -49,7 +49,7 @@ void LightNode::CastShadow(bool cast)
 		glBindFramebuffer(GL_FRAMEBUFFER, m_shadow_map_fbo);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_shadow_map_texture, 0);
 		glDrawBuffer(GL_NONE);
-		//glReadBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
 
 		GLenum status = Tools::CheckFramebufferStatus(m_shadow_map_fbo);
 		if (status != GL_FRAMEBUFFER_COMPLETE)
@@ -61,7 +61,6 @@ void LightNode::CastShadow(bool cast)
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }
-
 
 void LightNode::SetColor(const glm::vec3& color)
 {
@@ -90,7 +89,7 @@ void LightNode::SetConeSize(float umbra, float penumbra)
 	m_penumbra = penumbra;
 
 	float near_clipping_range = 0.1f;
-	float far_clipping_range = 1000.f;
+	float far_clipping_range = 100.f;
 	
 	float h = near_clipping_range * glm::tan(glm::radians(m_penumbra * 0.5f));
 	m_projection_matrix = glm::frustum(-h, h, -h, h, near_clipping_range, far_clipping_range);

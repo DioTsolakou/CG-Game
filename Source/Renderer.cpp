@@ -64,7 +64,7 @@ void Renderer::InitCamera()
 	this->FOV = 90.f;
 	this->aspectRatio = this->m_screen_width / (float)this->m_screen_height;
 	this->nearPlane = 0.1f;
-	this->farPlane = 200.f;
+	this->farPlane = 150.f;
 
 	this->m_camera_position = glm::vec3(0, 0, -1.5);
 	this->m_camera_target_position = glm::vec3(0, 0, -2.5);
@@ -82,7 +82,7 @@ bool Renderer::InitLights()
 	this->m_light.SetPosition(this->m_camera_position);
 	this->m_light.SetTarget(this->m_camera_target_position);
 	this->m_light.SetConeSize(40, 50);
-	this->m_light.CastShadow(false);
+	this->m_light.CastShadow(true);
 
 	return true;
 }
@@ -995,22 +995,24 @@ void Renderer::Shoot(bool shoot)
 {
 	if (shoot)
 	{
+		glm::vec3 direction = glm::normalize(m_camera_target_position - m_camera_position);
 		for (int i = 0; i < this->m_collidables_nodes.size(); i++)
 		{
 			//CollidableNode* node = m_collidables_nodes[i];
 			//if (node->GetType() != MAP_ASSETS::CH_IRIS || node->GetType() != MAP_ASSETS::CH_CANNON)
 				//continue;
 
-			if (CalculateDistance(m_camera_position, m_collidables_nodes[i]->GetPosition()) > 150.f) continue;
+			if (CalculateDistance(m_camera_position, m_collidables_nodes[i]->GetPosition()) > 75.f) continue;
 
 			float_t isectT = 0.f;
 			int32_t primID = -1;
-			if (m_collidables_nodes[i]->intersectRay(m_camera_position, m_camera_target_position, m_world_matrix, isectT, primID))
+			if (m_collidables_nodes[i]->intersectRay(m_camera_position, direction, m_world_matrix, isectT, primID))
 			{
 				//m_collidables_nodes[i]->SetRenderable(false);
+				//m_nodes[i]->SetRenderable(false);
 				m_collidables_nodes.erase(m_collidables_nodes.begin() + i);
-				m_nodes[i]->SetRenderable(false);
-				//break;
+				m_nodes.erase(m_nodes.begin() + i);
+				break;
 			}
 		}
 	}

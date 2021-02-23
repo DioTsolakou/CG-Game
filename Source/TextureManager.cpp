@@ -67,12 +67,12 @@ GLuint TextureManager::RequestTexture(const char* filename, bool hasMipmaps)
 	case 3: // no alpha channel
 		if (surf->format->Rmask == 0x000000ff) texture_format = GL_RGB;
 		else texture_format = GL_BGR;
-		nOfColors = GL_RGB;
+		nOfColors = GL_COMPRESSED_RGB;
 		break;
 	case 4: // contains alpha channel
 		if (surf->format->Rmask == 0x000000ff)	 texture_format = GL_RGBA;
 		else texture_format = GL_BGRA;
-		nOfColors = GL_RGBA;
+		nOfColors = GL_COMPRESSED_RGBA;
 		break;
 
 	default:

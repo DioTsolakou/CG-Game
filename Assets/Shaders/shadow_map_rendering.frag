@@ -1,3 +1,8 @@
 #version 330 core
 
-void main(void) { /* Empty */ }
+layout(location = 0) out float fragDepth;
+
+void main(void)
+{
+	fragDepth = gl_FragCoord.z;
+}
