@@ -11,7 +11,6 @@
 #include <iostream>
 #include <math.h>
 
-// RENDERER
 Renderer::Renderer()
 {
 	this->m_nodes = {};
@@ -295,30 +294,8 @@ void Renderer::UpdateGeometry(float dt)
 void Renderer::UpdateCamera(float dt)
 {
 	glm::vec3 direction = glm::normalize(m_camera_target_position - m_camera_position);
-	std::vector<float> isectDst;
 
-	float distance = 17.5f;
-	for (auto& node : this->m_collidables_nodes)
-	{
-		if (CalculateDistance(m_camera_position, node->GetPosition()) > distance) continue;
-		//std::cout << "checking with " << node->GetPosition().x << " " << node->GetPosition().y << " " << node->GetPosition().z << std::endl;
-		float_t isectT = 0.f;
-		int32_t primID = -1;
-		isectDst.clear();
-		isectDst = node->calculateCameraCollision(m_camera_position, direction, m_world_matrix, isectT, primID);
-		for (auto it = isectDst.begin(); it != isectDst.end(); ++it) {
-			if (*it < distance) {
-				int pos = it - isectDst.begin();
-				//std::cout << pos << ": " << *it << std::endl;
-				//m_camera_movement.x *= -1; m_camera_movement.y *= -1;
-				if (pos >= 1 && pos <= 3) m_camera_movement.y *= (m_camera_movement.y < 0) ? -1.f : 1.f;
-				if (pos >= 5 && pos <= 7) m_camera_movement.y *= (m_camera_movement.y > 0) ? -1.f : 1.f;
-				if (pos >= 3 && pos <= 5) m_camera_movement.x *= (m_camera_movement.x < 0) ? -1.f : 1.f;
-				if (pos == 0 || pos == 1 || pos == 7) m_camera_movement.x *= (m_camera_movement.x > 0) ? -1.f : 1.f;
-				//break;
-			}
-		}
-	}
+	this->CollisionDetection(direction);
 
 	m_camera_position = m_camera_position + (m_camera_movement.x * 5.f * dt) * direction;
 	m_camera_target_position = m_camera_target_position + (m_camera_movement.x * 5.f * dt) * direction;
@@ -419,6 +396,10 @@ void Renderer::RenderPostProcess()
 void Renderer::RenderStaticGeometry()
 {
 	glm::mat4 proj = m_projection_matrix * m_view_matrix * m_world_matrix;
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 
 	for (auto& node : this->m_nodes)
 	{
@@ -840,7 +821,7 @@ void Renderer::BuildMap(bool& initialized, std::array<const char*, MAP_ASSETS::S
 	this->PlaceObject(initialized, mapAssets, PIPE, glm::vec3(0.f, 0.f, -11.f), glm::vec3(90.f, 0.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, BEAM, glm::vec3(0.f, 0.f, -18.f), glm::vec3(0.f, 0.f, 90.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_LEFT, glm::vec3(-5.f, 0.f, -20.f), glm::vec3(0.f, 0.f, 0.f));
-	this->PlaceObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-10.f, 0.f, -40.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(-1.f, 1.f, 1.f));
+	this->PlaceObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-21.5f, 0.f, -40.f), glm::vec3(0.f, -90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-42.5f, 0.f, -40.f), glm::vec3(0.f, 0.f, 0.f)); // corridor curve needs to be 32.5 meters left/right to create 180 turn
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-42.5f, 0.f, -20.f), glm::vec3(0.f, 0.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-42.5f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f));
@@ -888,8 +869,8 @@ void Renderer::BuildMap(bool& initialized, std::array<const char*, MAP_ASSETS::S
 
 	this->PlaceObject(initialized, mapAssets, WALL, glm::vec3(-68.75f, 0.f, -67.75f), glm::vec3(90.f, 90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CANNON_MOUNT, glm::vec3(-65.75f, 2.f, -67.75f), glm::vec3(180.f, 0.f, 0.f));
-	this->PlaceObject(initialized, mapAssets, CANNON, glm::vec3(-67.75f, -0.5f, 12.95f), glm::vec3(0.f, 0.f, 0.f));
-	this->PlaceObject(initialized, mapAssets, CANNON, glm::vec3(-67.75f, -0.5f, 11.55f), glm::vec3(0.f, 0.f, 0.f));
+	this->PlaceObject(initialized, mapAssets, CANNON, glm::vec3(-67.75f, -0.5f, -67.75f), glm::vec3(0.f, 0.f, 0.f));
+	this->PlaceObject(initialized, mapAssets, CANNON, glm::vec3(-67.75f, -0.5f, -67.75f), glm::vec3(0.f, 0.f, 0.f));
 
 	this->PlaceObject(initialized, mapAssets, WALL, glm::vec3(-68.75f, 2.75f, -87.25f), glm::vec3(0.f, 0.f, 90.f), glm::vec3(0.85f, 1.f, 1.f));
 	this->PlaceObject(initialized, mapAssets, IRIS, glm::vec3(-65.5f, 2.75f, -87.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.2f, 1.2f, 1.f));
@@ -962,9 +943,9 @@ void Renderer::BuildMap(bool& initialized, std::array<const char*, MAP_ASSETS::S
 	this->m_world_matrix = glm::mat4(1.f);
 }
 
-void Renderer::CollisionDetection(CollidableNode* node)
+void Renderer::CollisionDetection(glm::vec3& direction)
 {
-	switch (node->GetType()) 
+	/*switch (node->GetType()) 
 	{
 		case MAP_ASSETS::CH_WALL:
 			std::cout << "we hit a wall" << std::endl;
@@ -977,6 +958,31 @@ void Renderer::CollisionDetection(CollidableNode* node)
 		default:
 			std::cout << "we hit something else" << std::endl;
 			break;
+	}*/
+
+	std::vector<float> isectDst;
+
+	float distance = 17.5f;
+	for (auto& node : this->m_collidables_nodes)
+	{
+		if (CalculateDistance(m_camera_position, node->GetPosition()) > distance) continue;
+		//std::cout << "checking with " << node->GetPosition().x << " " << node->GetPosition().y << " " << node->GetPosition().z << std::endl;
+		float_t isectT = 0.f;
+		int32_t primID = -1;
+		isectDst.clear();
+		isectDst = node->calculateCameraCollision(m_camera_position, direction, m_world_matrix, isectT, primID);
+		for (auto it = isectDst.begin(); it != isectDst.end(); ++it) {
+			if (*it < distance) {
+				int pos = it - isectDst.begin();
+				//std::cout << pos << ": " << *it << std::endl;
+				//m_camera_movement.x *= -1; m_camera_movement.y *= -1;
+				if (pos >= 1 && pos <= 3) m_camera_movement.y *= (m_camera_movement.y < 0) ? -1.f : 1.f;
+				if (pos >= 5 && pos <= 7) m_camera_movement.y *= (m_camera_movement.y > 0) ? -1.f : 1.f;
+				if (pos >= 3 && pos <= 5) m_camera_movement.x *= (m_camera_movement.x < 0) ? -1.f : 1.f;
+				if (pos == 0 || pos == 1 || pos == 7) m_camera_movement.x *= (m_camera_movement.x > 0) ? -1.f : 1.f;
+				//break;
+			}
+		}
 	}
 }
 
@@ -985,21 +991,27 @@ float Renderer::CalculateDistance(glm::vec3 u, glm::vec3 v)
 	return sqrt(pow(u.x - v.x, 2) + pow(u.y - v.y, 2) + pow(u.z - v.z, 2));
 }
 
-void Renderer::Shoot()
+void Renderer::Shoot(bool shoot)
 {
-	for (int i = 0; i < this->m_collidables_nodes.size(); i++)
+	if (shoot)
 	{
-		//CollidableNode* node = m_collidables_nodes[i];
-		//if (node->GetType() != MAP_ASSETS::CH_IRIS || node->GetType() != MAP_ASSETS::CH_CANNON)
-			//continue;
-		float_t isectT = 0.f;
-		int32_t primID = -1;
-		if (m_collidables_nodes[i]->intersectRay(m_camera_position, m_camera_target_position, m_world_matrix, isectT, primID))
+		for (int i = 0; i < this->m_collidables_nodes.size(); i++)
 		{
-			//m_collidables_nodes[i]->SetRenderable(false);
-			m_collidables_nodes.erase(m_collidables_nodes.begin() + i);
-			m_nodes[i]->SetRenderable(false);
-			break;
+			//CollidableNode* node = m_collidables_nodes[i];
+			//if (node->GetType() != MAP_ASSETS::CH_IRIS || node->GetType() != MAP_ASSETS::CH_CANNON)
+				//continue;
+
+			if (CalculateDistance(m_camera_position, m_collidables_nodes[i]->GetPosition()) > 150.f) continue;
+
+			float_t isectT = 0.f;
+			int32_t primID = -1;
+			if (m_collidables_nodes[i]->intersectRay(m_camera_position, m_camera_target_position, m_world_matrix, isectT, primID))
+			{
+				//m_collidables_nodes[i]->SetRenderable(false);
+				m_collidables_nodes.erase(m_collidables_nodes.begin() + i);
+				m_nodes[i]->SetRenderable(false);
+				//break;
+			}
 		}
 	}
 }

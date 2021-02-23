@@ -117,9 +117,9 @@ public:
 	glm::mat4									Rotate(GeometryNode& object, glm::vec3 rotation);
 	glm::mat4									Scale(GeometryNode& object, glm::vec3 scale);
 	void										BuildMap(bool &initialized, std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets);
-	void										CollisionDetection(CollidableNode* node);
+	void										CollisionDetection(glm::vec3& direction);
 	float										CalculateDistance(glm::vec3 u, glm::vec3);
-	void										Shoot();
+	void										Shoot(bool shoot);
 };
 
 #endif

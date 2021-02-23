@@ -119,14 +119,6 @@ void keyboardInput(bool &quit, float& movement_factor)
 		{
 			renderer->CameraMoveRight(true);
 		}
-		/*else if (event.key.keysym.sym == SDLK_q)
-		{
-			renderer->CameraRollLeft(true);
-		}
-		else if (event.key.keysym.sym == SDLK_e)
-		{
-			renderer->CameraRollRight(true);
-		}*/
 		else if (event.key.keysym.sym == SDLK_r) renderer->ReloadShaders();
 	}
 	else if (event.type == SDL_KEYUP)
@@ -148,14 +140,6 @@ void keyboardInput(bool &quit, float& movement_factor)
 		{
 			renderer->CameraMoveRight(false);
 		}
-		/*else if (event.key.keysym.sym == SDLK_q)
-		{
-			renderer->CameraRollLeft(false);
-		}
-		else if (event.key.keysym.sym == SDLK_e)
-		{
-			renderer->CameraRollRight(false);
-		}*/
 	}
 }
 
@@ -169,19 +153,29 @@ void mouseInput(bool &mouse_button_pressed, bool &right_mouse_button_pressed, gl
 		renderer->CameraLook(glm::vec2(prev_mouse_position - glm::vec2(x, y)));
 		prev_mouse_position = glm::vec2(x, y);
 	}
-	else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
+	else if (event.type == SDL_MOUSEBUTTONDOWN)
 	{
 		if (event.button.button == SDL_BUTTON_LEFT)
 		{
 			// to do : call function to shoot
-			renderer->Shoot();
+			renderer->Shoot(true);
 			mouse_button_pressed = (event.type == SDL_MOUSEBUTTONDOWN);
 		}
 		else if (event.button.button == SDL_BUTTON_RIGHT)
 		{
-			int x = event.button.x;
-			int y = event.button.y;
 			right_mouse_button_pressed = (event.type == SDL_MOUSEBUTTONDOWN);
+		}
+	}
+	else if (event.type == SDL_MOUSEBUTTONUP)
+	{
+		if (event.button.button == SDL_BUTTON_LEFT)
+		{
+			renderer->Shoot(false);
+			mouse_button_pressed = (event.type == SDL_MOUSEBUTTONUP);
+		}
+		else if (event.button.button == SDL_BUTTON_RIGHT)
+		{
+			right_mouse_button_pressed = (event.type == SDL_MOUSEBUTTONUP);
 		}
 	}
 }
