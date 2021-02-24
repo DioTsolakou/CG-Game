@@ -77,11 +77,11 @@ void Renderer::InitCamera()
 
 bool Renderer::InitLights()
 {
-	this->m_light.SetColor(glm::vec3(255.f, 230.f, 220.f));
+	this->m_light.SetColor(glm::vec3(255.f, 250.f, 244.f));
 	this->m_light.SetLightOffset(glm::vec3(0.f, -2.f, 0.f));
 	this->m_light.SetPosition(this->m_camera_position);
 	this->m_light.SetTarget(this->m_camera_target_position);
-	this->m_light.SetConeSize(40, 50);
+	this->m_light.SetConeSize(150, 150);
 	this->m_light.CastShadow(true);
 
 	return true;
@@ -453,6 +453,8 @@ void Renderer::RenderStaticGeometry()
 
 		glBindVertexArray(0);
 	}
+
+	glDisable(GL_CULL_FACE);
 }
 
 void Renderer::RenderCurves()
@@ -661,6 +663,9 @@ void Renderer::RenderShadowMaps()
 
 		glm::mat4 proj = m_light.GetProjectionMatrix() * m_light.GetViewMatrix() * m_world_matrix;
 
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+
 		for (auto& node : this->m_nodes)
 		{
 			glBindVertexArray(node->m_vao);
@@ -675,7 +680,8 @@ void Renderer::RenderShadowMaps()
 			glBindVertexArray(0);
 		}
 
-		glm::vec3 camera_dir = normalize(m_camera_target_position - m_camera_position);
+		// seems unnecessary since it just makes a shadow of the collision hull encasing the actual shadow sometimes
+		/*glm::vec3 camera_dir = normalize(m_camera_target_position - m_camera_position);
 		float_t isectT = 0.f;
 		int32_t primID;
 
@@ -693,10 +699,11 @@ void Renderer::RenderShadowMaps()
 			}
 
 			glBindVertexArray(0);
-		}
+		}*/
 
 		m_spot_light_shadow_map_program.Unbind();
 		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }
@@ -962,7 +969,7 @@ void Renderer::CollisionDetection(glm::vec3& direction)
 
 	std::vector<float> isectDst;
 
-	float distance = 17.5f;
+	float distance = 17.f;
 	for (auto& node : this->m_collidables_nodes)
 	{
 		if (CalculateDistance(m_camera_position, node->GetPosition()) > distance) continue;

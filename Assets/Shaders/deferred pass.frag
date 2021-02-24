@@ -23,7 +23,7 @@ uniform float uniform_light_penumbra;
 
 uniform mat4 uniform_light_projection_view;
 uniform int uniform_cast_shadows;
-uniform float uniform_constant_bias = 0.0002;
+uniform float uniform_constant_bias = 0.005;
 
 uniform sampler2D uniform_shadow_map;
 
@@ -132,8 +132,8 @@ float shadow(vec3 pwcs)
 
 	// sample shadow map
 	//return shadow_nearest(plcs.xyz);
-	//return shadow_pcf2x2_weighted(plcs.xyz);
-	return shadow_pcf2x2_mean(plcs.xyz);
+	return shadow_pcf2x2_weighted(plcs.xyz);
+	//return shadow_pcf2x2_mean(plcs.xyz);
 }
 
 vec3 blinn_phong(
@@ -175,7 +175,7 @@ vec3 fresnel(
 	const in float VdotH,
 	const in float metallic)
 {
-	const vec3 f0 = mix(reflectance, diffColor, metallic);
+	vec3 f0 = mix(reflectance, diffColor, metallic);
 	float u = 1.0 - VdotH;
 	float u5 = (u * u) * (u * u) * u;
 	return min(vec3(1.0), f0  + (vec3(1.0) - f0) * u5);
@@ -252,14 +252,16 @@ void main(void)
 		albedo.xyz, mask,
 		vec3(pos_wcs.a, normal_wcs.a, albedo.a));
 
-	float spotEffect = 1.0;//compute_spotlight(surfToLight);
+	vec3 c_t = cook_torrance(surfToEye, surfToLight, pos_wcs.xyz,
+		normal_wcs.xyz,
+		albedo.xyz, mask,
+		vec3(pos_wcs.a, normal_wcs.a, albedo.a));
+
+	float spotEffect = compute_spotlight(surfToLight);
 
 	//out_color = vec4(shadow_value * brdf * spotEffect, 1.0);
 
-	out_color = vec4(cook_torrance(surfToEye, surfToLight, pos_wcs.xyz,
-		normal_wcs.xyz,
-		albedo.xyz, mask,
-		vec3(pos_wcs.a, normal_wcs.a, albedo.a)), 1.0);
+	out_color = vec4(shadow_value * c_t * spotEffect, 1.0);
 
 	/*out_color = 0.8 * vec4(shadow_value * brdf * spotEffect, 1.0) +
 				0.2 * vec4(cook_torrance(surfToEye, surfToLight, pos_wcs.xyz,
