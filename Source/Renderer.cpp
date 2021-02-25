@@ -641,8 +641,8 @@ void Renderer::RenderShadowMaps()
 
 		glm::mat4 proj = m_light.GetProjectionMatrix() * m_light.GetViewMatrix() * m_world_matrix;
 
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_FRONT);
+		/*glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);*/
 
 		for (auto& node : this->m_nodes)
 		{
@@ -681,7 +681,7 @@ void Renderer::RenderShadowMaps()
 
 		m_spot_light_shadow_map_program.Unbind();
 		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_CULL_FACE);
+		//glDisable(GL_CULL_FACE);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }
@@ -997,6 +997,13 @@ void Renderer::Shoot(bool shoot)
 					//m_nodes[i]->SetRenderable(false);
 					m_collidables_nodes.erase(m_collidables_nodes.begin() + i);
 					m_nodes.erase(m_nodes.begin() + i);
+
+					if (node->GetType() == MAP_ASSETS::CH_IRIS)
+					{
+						int x = m_collidables_nodes[i - 1]->GetType() == MAP_ASSETS::CH_WALL ? 1 : 2;
+						m_collidables_nodes.erase(m_collidables_nodes.begin() + i - x);
+						m_nodes.erase(m_nodes.begin() + i - x);
+					}
 					break;
 				}
 			}
