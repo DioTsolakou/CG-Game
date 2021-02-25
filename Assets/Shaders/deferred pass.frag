@@ -133,8 +133,8 @@ float shadow(vec3 pwcs)
 
 	// sample shadow map
 	//return shadow_nearest(plcs.xyz);
-	return shadow_pcf2x2_weighted(plcs.xyz);
-	//return shadow_pcf2x2_mean(plcs.xyz);
+	//return shadow_pcf2x2_weighted(plcs.xyz);
+	return shadow_pcf2x2_mean(plcs.xyz);
 }
 
 vec3 blinn_phong(
@@ -244,9 +244,9 @@ void main(void)
 	vec3 surfToEye = normalize(uniform_camera_pos - pos_wcs.xyz);
 	vec3 surfToLight = normalize(uniform_light_pos - pos_wcs.xyz);
 
-	float cosTheta = clamp(dot( surfToEye, surfToLight ), 0,1);
+	float cosTheta = clamp(dot(surfToEye, surfToLight), 0,1);
 
-	uniform_constant_bias = 0.003*tan(acos(cosTheta));
+	uniform_constant_bias = 0.0035*tan(acos(cosTheta));
 
 	// check if we have shadows
 	float shadow_value = (uniform_cast_shadows == 1) ? shadow(pos_wcs.xyz) : 1.0;
