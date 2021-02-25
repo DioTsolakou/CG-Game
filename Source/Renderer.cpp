@@ -457,18 +457,6 @@ void Renderer::RenderStaticGeometry()
 	glDisable(GL_CULL_FACE);
 }
 
-void Renderer::RenderCurves()
-{
-	glm::mat4 proj = m_projection_matrix * m_view_matrix * m_world_matrix;
-
-	for (int i = 0; i < this->m_curve_positions.size(); i++)
-	{
-		auto& node = this->m_collidables_nodes.at(this->m_curve_positions.at(i));
-		if (!node->GetRenderable()) continue;
-		PassCollidableToShader(*node, proj);
-	}
-}
-
 void Renderer::RenderCollidableGeometry()
 {
 	glm::mat4 proj = m_projection_matrix * m_view_matrix * m_world_matrix;
@@ -480,74 +468,65 @@ void Renderer::RenderCollidableGeometry()
 
 	for (auto& node : this->m_collidables_nodes)
 	{
-		if (!node->GetRenderable()) continue;
-		//if (node->GetType() == CORRIDOR_CURVE) {
-			//continue;
-		//}
-		PassCollidableToShader(*node, proj);
+		int32_t primID = -1;
+		int32_t totalRenderedPrims = 0;
+
+		glBindVertexArray(node->m_vao);
+
+		m_geometry_program.loadMat4("uniform_projection_matrix", proj * node->app_model_matrix);
+		m_geometry_program.loadMat4("uniform_normal_matrix", glm::transpose(glm::inverse(m_world_matrix * node->app_model_matrix)));
+		m_geometry_program.loadMat4("uniform_world_matrix", m_world_matrix * node->app_model_matrix);
+		m_geometry_program.loadFloat("uniform_time", m_continous_time);
+
+
+		for (int j = 0; j < node->parts.size(); ++j)
+		{
+			m_geometry_program.loadVec3("uniform_diffuse", node->parts[j].diffuse);
+			m_geometry_program.loadVec3("uniform_ambient", node->parts[j].ambient);
+			m_geometry_program.loadVec3("uniform_specular", node->parts[j].specular);
+			m_geometry_program.loadFloat("uniform_shininess", node->parts[j].shininess);
+			m_geometry_program.loadInt("uniform_has_tex_diffuse", (node->parts[j].diffuse_textureID > 0) ? 1 : 0);
+			m_geometry_program.loadInt("uniform_has_tex_mask", (node->parts[j].mask_textureID > 0) ? 1 : 0);
+			m_geometry_program.loadInt("uniform_has_tex_emissive", (node->parts[j].emissive_textureID > 0) ? 1 : 0);
+			m_geometry_program.loadInt("uniform_has_tex_normal", (node->parts[j].bump_textureID > 0 || node->parts[j].normal_textureID > 0) ? 1 : 0);
+			m_geometry_program.loadInt("uniform_is_tex_bumb", (node->parts[j].bump_textureID > 0) ? 1 : 0);
+			m_geometry_program.loadInt("uniform_prim_id", primID - totalRenderedPrims);
+
+			glActiveTexture(GL_TEXTURE0);
+			m_geometry_program.loadInt("uniform_tex_diffuse", 0);
+			glBindTexture(GL_TEXTURE_2D, node->parts[j].diffuse_textureID);
+
+			if (node->parts[j].mask_textureID > 0)
+			{
+				glActiveTexture(GL_TEXTURE1);
+				m_geometry_program.loadInt("uniform_tex_mask", 1);
+				glBindTexture(GL_TEXTURE_2D, node->parts[j].mask_textureID);
+			}
+
+			if ((node->parts[j].bump_textureID > 0 || node->parts[j].normal_textureID > 0))
+			{
+				glActiveTexture(GL_TEXTURE2);
+				m_geometry_program.loadInt("uniform_tex_normal", 2);
+				glBindTexture(GL_TEXTURE_2D, node->parts[j].bump_textureID > 0 ?
+					node->parts[j].bump_textureID : node->parts[j].normal_textureID);
+			}
+
+			if (node->parts[j].emissive_textureID > 0)
+			{
+				glActiveTexture(GL_TEXTURE3);
+				m_geometry_program.loadInt("uniform_tex_emissive", 3);
+				glBindTexture(GL_TEXTURE_2D, node->parts[j].emissive_textureID);
+			}
+
+			glDrawArrays(GL_TRIANGLES, node->parts[j].start_offset, node->parts[j].count);
+			totalRenderedPrims += node->parts[j].count;
+
+		}
+
+		glBindVertexArray(0);
 	}
 
 	glDisable(GL_BLEND);
-}
-
-void Renderer::PassCollidableToShader(CollidableNode& node, glm::mat4 proj)
-{
-	int32_t primID = -1;
-	int32_t totalRenderedPrims = 0;
-
-	glBindVertexArray(node.m_vao);
-
-	m_geometry_program.loadMat4("uniform_projection_matrix", proj * node.app_model_matrix);
-	m_geometry_program.loadMat4("uniform_normal_matrix", glm::transpose(glm::inverse(m_world_matrix * node.app_model_matrix)));
-	m_geometry_program.loadMat4("uniform_world_matrix", m_world_matrix * node.app_model_matrix);
-	m_geometry_program.loadFloat("uniform_time", m_continous_time);
-
-
-	for (int j = 0; j < node.parts.size(); ++j)
-	{
-		m_geometry_program.loadVec3("uniform_diffuse", node.parts[j].diffuse);
-		m_geometry_program.loadVec3("uniform_ambient", node.parts[j].ambient);
-		m_geometry_program.loadVec3("uniform_specular", node.parts[j].specular);
-		m_geometry_program.loadFloat("uniform_shininess", node.parts[j].shininess);
-		m_geometry_program.loadInt("uniform_has_tex_diffuse", (node.parts[j].diffuse_textureID > 0) ? 1 : 0);
-		m_geometry_program.loadInt("uniform_has_tex_mask", (node.parts[j].mask_textureID > 0) ? 1 : 0);
-		m_geometry_program.loadInt("uniform_has_tex_emissive", (node.parts[j].emissive_textureID > 0) ? 1 : 0);
-		m_geometry_program.loadInt("uniform_has_tex_normal", (node.parts[j].bump_textureID > 0 || node.parts[j].normal_textureID > 0) ? 1 : 0);
-		m_geometry_program.loadInt("uniform_is_tex_bumb", (node.parts[j].bump_textureID > 0) ? 1 : 0);
-		m_geometry_program.loadInt("uniform_prim_id", primID - totalRenderedPrims);
-
-		glActiveTexture(GL_TEXTURE0);
-		m_geometry_program.loadInt("uniform_tex_diffuse", 0);
-		glBindTexture(GL_TEXTURE_2D, node.parts[j].diffuse_textureID);
-
-		if (node.parts[j].mask_textureID > 0)
-		{
-			glActiveTexture(GL_TEXTURE1);
-			m_geometry_program.loadInt("uniform_tex_mask", 1);
-			glBindTexture(GL_TEXTURE_2D, node.parts[j].mask_textureID);
-		}
-
-		if ((node.parts[j].bump_textureID > 0 || node.parts[j].normal_textureID > 0))
-		{
-			glActiveTexture(GL_TEXTURE2);
-			m_geometry_program.loadInt("uniform_tex_normal", 2);
-			glBindTexture(GL_TEXTURE_2D, node.parts[j].bump_textureID > 0 ?
-				node.parts[j].bump_textureID : node.parts[j].normal_textureID);
-		}
-
-		if (node.parts[j].emissive_textureID > 0)
-		{
-			glActiveTexture(GL_TEXTURE3);
-			m_geometry_program.loadInt("uniform_tex_emissive", 3);
-			glBindTexture(GL_TEXTURE_2D, node.parts[j].emissive_textureID);
-		}
-
-		glDrawArrays(GL_TRIANGLES, node.parts[j].start_offset, node.parts[j].count);
-		totalRenderedPrims += node.parts[j].count;
-
-	}
-
-	glBindVertexArray(0);
 }
 
 void Renderer::RenderDeferredShading()
@@ -638,7 +617,6 @@ void Renderer::RenderGeometry()
 
 	m_geometry_program.Bind();
 	RenderStaticGeometry();
-	//RenderCurves();
 	RenderCollidableGeometry();
 
 	m_geometry_program.Unbind();
@@ -1005,21 +983,22 @@ void Renderer::Shoot(bool shoot)
 		glm::vec3 direction = glm::normalize(m_camera_target_position - m_camera_position);
 		for (int i = 0; i < this->m_collidables_nodes.size(); i++)
 		{
-			//CollidableNode* node = m_collidables_nodes[i];
-			//if (node->GetType() != MAP_ASSETS::CH_IRIS || node->GetType() != MAP_ASSETS::CH_CANNON)
-				//continue;
-
-			if (CalculateDistance(m_camera_position, m_collidables_nodes[i]->GetPosition()) > 75.f) continue;
-
-			float_t isectT = 0.f;
-			int32_t primID = -1;
-			if (m_collidables_nodes[i]->intersectRay(m_camera_position, direction, m_world_matrix, isectT, primID))
+			CollidableNode* node = m_collidables_nodes[i];
+			//std::cout << "node type being shot : " << node->GetType() << std::endl;
+			if (node->GetType() == MAP_ASSETS::CH_IRIS || node->GetType() == MAP_ASSETS::CH_CANNON)
 			{
-				//m_collidables_nodes[i]->SetRenderable(false);
-				//m_nodes[i]->SetRenderable(false);
-				m_collidables_nodes.erase(m_collidables_nodes.begin() + i);
-				m_nodes.erase(m_nodes.begin() + i);
-				break;
+				if (CalculateDistance(m_camera_position, m_collidables_nodes[i]->GetPosition()) > 75.f) continue;
+
+				float_t isectT = 0.f;
+				int32_t primID = -1;
+				if (m_collidables_nodes[i]->intersectRay(m_camera_position, direction, m_world_matrix, isectT, primID))
+				{
+					//m_collidables_nodes[i]->SetRenderable(false);
+					//m_nodes[i]->SetRenderable(false);
+					m_collidables_nodes.erase(m_collidables_nodes.begin() + i);
+					m_nodes.erase(m_nodes.begin() + i);
+					break;
+				}
 			}
 		}
 	}

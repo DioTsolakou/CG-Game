@@ -16,9 +16,9 @@ SDL_Window* window;
 SDL_GLContext gContext;
 const int SCREEN_WIDTH = 1920;
 const int SCREEN_HEIGHT = 1080;
-Uint32 fps_lasttime = SDL_GetTicks(); //the last recorded time.
-Uint32 fps_current; //the current FPS.
-Uint32 fps_frames = 0; //frames passed since the last recorded fps.
+Uint32 fps_lasttime = SDL_GetTicks(); // the last recorded time.
+Uint32 fps_current; // the current FPS.
+Uint32 fps_frames = 0; // frames passed since the last recorded fps.
 
 //Event handler
 SDL_Event event;
@@ -60,7 +60,7 @@ bool init()
 		SCREEN_WIDTH, SCREEN_HEIGHT,
 		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
-	// sets proper fullscreen
+	// set proper fullscreen
 	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
 	if (window == NULL)
@@ -102,7 +102,7 @@ void keyboardInput(bool &quit, float& movement_factor)
 	if (event.type == SDL_KEYDOWN)
 	{
 		if (event.key.keysym.sym == SDLK_ESCAPE) quit = true;
-		if (event.key.keysym.sym == SDLK_LSHIFT) movement_factor = 5.f;
+		if (event.key.keysym.sym == SDLK_LSHIFT) movement_factor = 5.f; // just for testing, remove later
 		if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP)
 		{
 			renderer->CameraMoveForward(true, movement_factor);
@@ -143,7 +143,7 @@ void keyboardInput(bool &quit, float& movement_factor)
 	}
 }
 
-void mouseInput(bool &mouse_button_pressed, bool &right_mouse_button_pressed, glm::vec2 prev_mouse_position)
+void mouseInput(bool &mouse_button_pressed, bool& right_mouse_button_pressed, glm::vec2 prev_mouse_position)
 {
 	if (event.type == SDL_MOUSEMOTION)
 	{
@@ -157,7 +157,6 @@ void mouseInput(bool &mouse_button_pressed, bool &right_mouse_button_pressed, gl
 	{
 		if (event.button.button == SDL_BUTTON_LEFT)
 		{
-			// to do : call function to shoot
 			renderer->Shoot(true);
 			mouse_button_pressed = (event.type == SDL_MOUSEBUTTONDOWN);
 		}
@@ -178,6 +177,19 @@ void mouseInput(bool &mouse_button_pressed, bool &right_mouse_button_pressed, gl
 			right_mouse_button_pressed = (event.type == SDL_MOUSEBUTTONUP);
 		}
 	}
+}
+
+void showFPS()
+{
+	fps_frames++;
+	if (fps_lasttime < SDL_GetTicks() - FPS_INTERVAL * 1000)
+	{
+		fps_lasttime = SDL_GetTicks();
+		fps_current = fps_frames;
+		fps_frames = 0;
+	}
+
+	cout << "fps: " << fps_current << endl;
 }
 
 int main(int argc, char* argv[])
@@ -219,17 +231,7 @@ int main(int argc, char* argv[])
 			mouseInput(mouse_button_pressed, right_mouse_button_pressed, prev_mouse_position);
 		}
 
-		fps_frames++;
-		if (fps_lasttime < SDL_GetTicks() - FPS_INTERVAL * 1000)
-		{
-			fps_lasttime = SDL_GetTicks();
-			fps_current = fps_frames;
-			fps_frames = 0;
-		}
-
-		cout << "fps: " << fps_current << endl;
-
-		//SDL_WarpMouseInWindow(window, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2); might be unnecessary
+		showFPS();
 
 		// Compute the ellapsed time
 		auto simulation_end = chrono::steady_clock::now();

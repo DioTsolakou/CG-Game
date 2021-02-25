@@ -55,7 +55,6 @@ protected:
 		SIZE_ALL
 	};
 
-	// Protected Functions
 	bool InitShaders();
 	bool InitGeometricMeshes();
 	bool InitCommonItems();
@@ -65,16 +64,13 @@ protected:
 	void RenderGeometry();
 	void RenderDeferredShading();
 	void RenderStaticGeometry();
-	void RenderCurves();
 	void RenderCollidableGeometry();
-	void PassCollidableToShader(CollidableNode& node, glm::mat4 proj);
 	void RenderShadowMaps();
 	void RenderPostProcess();
 	void PlaceObject(bool& init, std::array<const char*, MAP_ASSETS::SIZE_ALL>& map_assets, MAP_ASSETS asset, glm::vec3 move, glm::vec3 rotate, glm::vec3 scale = glm::vec3(1.f, 1.f, 1.f));
 
 	std::vector<GeometryNode*> m_nodes;
 	std::vector<CollidableNode*> m_collidables_nodes;
-	std::vector<int> m_curve_positions;
 
 	LightNode									m_light;
 	ShaderProgram								m_geometry_program;

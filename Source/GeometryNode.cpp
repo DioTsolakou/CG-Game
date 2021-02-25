@@ -11,7 +11,6 @@ GeometryNode::GeometryNode()
 	m_vbo_texcoords = 0;
 	m_vbo_tangents = 0;
 	m_vbo_bitangents = 0;
-
 	renderable = true;
 }
 

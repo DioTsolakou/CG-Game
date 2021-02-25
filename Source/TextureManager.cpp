@@ -3,11 +3,7 @@
 #include "SDL2/SDL_image.h"
 #include <iostream>
 
-// Texture
-TextureManager::TextureManager()
-{
-
-}
+TextureManager::TextureManager(){}
 
 TextureManager::~TextureManager()
 {
@@ -67,12 +63,12 @@ GLuint TextureManager::RequestTexture(const char* filename, bool hasMipmaps)
 	case 3: // no alpha channel
 		if (surf->format->Rmask == 0x000000ff) texture_format = GL_RGB;
 		else texture_format = GL_BGR;
-		nOfColors = GL_COMPRESSED_RGB;
+		nOfColors = GL_COMPRESSED_RGB; // compressed takes more time during load but much less RAM, from 6gb to barely 2gb
 		break;
 	case 4: // contains alpha channel
 		if (surf->format->Rmask == 0x000000ff)	 texture_format = GL_RGBA;
 		else texture_format = GL_BGRA;
-		nOfColors = GL_COMPRESSED_RGBA;
+		nOfColors = GL_COMPRESSED_RGBA; // compressed takes more time during load but much less RAM, from 6gb to barely 2gb
 		break;
 
 	default:

@@ -14,9 +14,7 @@ OBJLoader::OBJLoader(void)
 }
 
 
-OBJLoader::~OBJLoader(void)
-{
-}
+OBJLoader::~OBJLoader(void){}
 
 /*
 Because sometimes there are faces that point to not yet defined vertices we will do a 2-pass scan

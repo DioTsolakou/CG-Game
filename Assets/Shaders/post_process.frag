@@ -12,6 +12,8 @@ uniform sampler2D uniform_tex_albedo;
 uniform sampler2D uniform_tex_mask;
 uniform sampler2D uniform_tex_depth;
 
+uniform float gamma = 2.2;
+
 // for perspective projection only
 float linearize(const in float depth)
 {
@@ -21,8 +23,34 @@ float linearize(const in float depth)
     return ((2.0 * near * far) / (far + near - z * (far - near))) / far;
 }
 
+vec3 reinhard(vec3 hdrColor)
+{
+	return hdrColor / (hdrColor + vec3(1.0));
+}
+
+vec3 exposure(vec3 hdrColor)
+{
+	return vec3(1.0) - exp(-hdrColor * 1.0); // multiplication value is exposure
+}
+
+vec3 hdr()
+{
+	vec3 hdrColor = texture(uniform_texture, f_texcoord).rgb;
+
+	// reinhard tone mapping
+	vec3 mappedColor = reinhard(hdrColor);
+
+	// exposure tone mapping
+	//vec3 mappedColor = exposure(hdrColor);
+
+	mappedColor = pow(mappedColor, vec3(1.0/gamma));
+
+	return mappedColor;
+}
+
 //#define PREVIEW_SHADOW_MAP
 #define CROSS_HAIR
+#define HDR
 
 void main(void)
 {
@@ -42,5 +70,9 @@ void main(void)
 	{
 		out_color = vec4(1.0, 1.0, 1.0, 1.0);
 	}
+#endif
+
+#ifdef HDR
+	out_color *= vec4(hdr(), 1.0); // looks too bright if it's not multiplied
 #endif
 }

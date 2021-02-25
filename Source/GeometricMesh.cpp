@@ -2,10 +2,7 @@
 #include "ObjLoader.h"
 #include <sstream>
 
-GeometricMesh::GeometricMesh()
-{
-
-}
+GeometricMesh::GeometricMesh(){}
 
 
 OBJMaterial* GeometricMesh::findMaterial(std::string str)
