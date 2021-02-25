@@ -993,16 +993,69 @@ void Renderer::Shoot(bool shoot)
 				int32_t primID = -1;
 				if (m_collidables_nodes[i]->intersectRay(m_camera_position, direction, m_world_matrix, isectT, primID))
 				{
-					//m_collidables_nodes[i]->SetRenderable(false);
-					//m_nodes[i]->SetRenderable(false);
-					m_collidables_nodes.erase(m_collidables_nodes.begin() + i);
-					m_nodes.erase(m_nodes.begin() + i);
-
-					if (node->GetType() == MAP_ASSETS::CH_IRIS)
+					if (node->GetType() == MAP_ASSETS::CH_CANNON)
 					{
-						int x = m_collidables_nodes[i - 1]->GetType() == MAP_ASSETS::CH_WALL ? 1 : 2;
-						m_collidables_nodes.erase(m_collidables_nodes.begin() + i - x);
-						m_nodes.erase(m_nodes.begin() + i - x);
+						m_collidables_nodes.erase(m_collidables_nodes.begin() + i);
+						m_nodes.erase(m_nodes.begin() + i);
+					}
+					else
+					{
+						/*for (int j = i - 2; j < i + 1; j++) {
+							if (m_collidables_nodes[j]->GetType() == MAP_ASSETS::CH_WALL ||
+								m_collidables_nodes[j]->GetType() == MAP_ASSETS::CH_IRIS)
+							{
+								m_collidables_nodes.erase(m_collidables_nodes.begin() + j);
+								m_nodes.erase(m_nodes.begin() + j);
+							}
+						}*/
+
+						/*int wallPos = m_collidables_nodes[i-1]->GetType() == MAP_ASSETS::CH_WALL ? 1 : 2;
+						int irisPos = wallPos == 1 ? 1 : -1;
+
+						m_collidables_nodes.erase(m_collidables_nodes.begin() + i + irisPos);
+						m_nodes.erase(m_nodes.begin() + i + irisPos);
+
+						m_collidables_nodes.erase(m_collidables_nodes.begin() + i - wallPos);
+						m_nodes.erase(m_nodes.begin() + i - wallPos;*/
+
+						/*int pos = m_collidables_nodes[i-1]->GetType() == MAP_ASSETS::CH_WALL ? 0 : 1;
+						if (pos == 1) {
+							m_collidables_nodes.erase(m_collidables_nodes.begin() + i - 1);
+							m_nodes.erase(m_nodes.begin() + i - 1);
+							m_collidables_nodes.erase(m_collidables_nodes.begin() + i - 1);
+							m_nodes.erase(m_nodes.begin() + i - 1);
+						}
+						else {
+							m_collidables_nodes.erase(m_collidables_nodes.begin() + i - 1);
+							m_nodes.erase(m_nodes.begin() + i - 1);
+							m_collidables_nodes.erase(m_collidables_nodes.begin() + i + 1);
+							m_nodes.erase(m_nodes.begin() + i + 1);
+						}*/
+
+						glm::vec3 newPos = glm::vec3(0.f, 100.f, 0.f);
+
+						m_collidables_nodes[i-1]->model_matrix = Move(*m_collidables_nodes[i-1], newPos);
+						m_collidables_nodes[i-1]->m_aabb.center = glm::vec3(m_collidables_nodes[i - 1]->model_matrix * glm::vec4(m_collidables_nodes[i - 1]->m_aabb.center, 1.f));
+						m_collidables_nodes[i-1]->SetPosition(newPos);
+						m_nodes[i - 1]->model_matrix = Move(*m_nodes[i - 1], newPos);
+						m_nodes[i - 1]->m_aabb.center = glm::vec3(m_nodes[i - 1]->model_matrix * glm::vec4(m_nodes[i - 1]->m_aabb.center, 1.f));
+						m_nodes[i - 1]->SetPosition(newPos);
+
+						m_collidables_nodes[i]->model_matrix = Move(*m_collidables_nodes[i], newPos);
+						m_collidables_nodes[i]->m_aabb.center = glm::vec3(m_collidables_nodes[i]->model_matrix * glm::vec4(m_collidables_nodes[i]->m_aabb.center, 1.f));
+						m_collidables_nodes[i]->SetPosition(newPos);
+						m_nodes[i]->model_matrix = Move(*m_nodes[i], newPos);
+						m_nodes[i]->m_aabb.center = glm::vec3(m_nodes[i]->model_matrix * glm::vec4(m_nodes[i]->m_aabb.center, 1.f));
+						m_nodes[i]->SetPosition(newPos);
+
+						int x = m_collidables_nodes[i-1]->GetType() == MAP_ASSETS::CH_WALL ? i+1 : i-2;
+						m_collidables_nodes[x]->model_matrix = Move(*m_collidables_nodes[x], newPos);
+						m_collidables_nodes[x]->m_aabb.center = glm::vec3(m_collidables_nodes[x]->model_matrix * glm::vec4(m_collidables_nodes[x]->m_aabb.center, 1.f));
+						m_collidables_nodes[x]->SetPosition(newPos);
+						m_nodes[x]->model_matrix = Move(*m_nodes[x], newPos);
+						m_nodes[x]->m_aabb.center = glm::vec3(m_nodes[x]->model_matrix * glm::vec4(m_nodes[x]->m_aabb.center, 1.f));
+						m_nodes[x]->SetPosition(newPos);
+						
 					}
 					break;
 				}

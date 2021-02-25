@@ -246,7 +246,7 @@ void main(void)
 
 	float cosTheta = clamp(dot( surfToEye, surfToLight ), 0,1);
 
-	uniform_constant_bias = 0.002*tan(acos(cosTheta));
+	uniform_constant_bias = 0.003*tan(acos(cosTheta));
 
 	// check if we have shadows
 	float shadow_value = (uniform_cast_shadows == 1) ? shadow(pos_wcs.xyz) : 1.0;
