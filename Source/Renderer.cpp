@@ -10,6 +10,7 @@
 #include <array>
 #include <iostream>
 #include <math.h>
+#include <chrono>
 
 Renderer::Renderer()
 {
@@ -908,12 +909,20 @@ void Renderer::BuildMap(bool& initialized, std::array<const char*, MAP_ASSETS::S
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(126.25f, 0.f, -85.75f), glm::vec3(180.f, 90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(126.25f, 0.f, -107.25f), glm::vec3(180.f, 180.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(111.f, 0.f, -114.25f), glm::vec3(0.f, -90.f, 0.f));
+	this->PlaceObject(initialized, mapAssets, PIPE, glm::vec3(111.f, 2.5f, -119.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 2.f));
+	this->PlaceObject(initialized, mapAssets, PIPE, glm::vec3(111.f, -2.5f, -119.25f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 2.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(91.f, 0.f, -114.25f), glm::vec3(0.f, -90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CANNON_MOUNT, glm::vec3(91.f, 5.f, -124.25f), glm::vec3(0.f, 90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CANNON, glm::vec3(91.f, 3.45f, -123.2f), glm::vec3(15.f, 90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CANNON, glm::vec3(91.f, 3.45f, -121.8f), glm::vec3(15.f, 90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(71.f, 0.f, -114.25f), glm::vec3(0.f, -90.f, 0.f));
+	this->PlaceObject(initialized, mapAssets, PIPE, glm::vec3(71.f, 0.f, -118.25f), glm::vec3(135.f, 0.f, 0.f));
+	this->PlaceObject(initialized, mapAssets, PIPE, glm::vec3(71.f, 0.f, -117.25f), glm::vec3(135.f, 0.f, 0.f));
+	this->PlaceObject(initialized, mapAssets, PIPE, glm::vec3(71.f, 0.f, -115.25f), glm::vec3(135.f, 0.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(51.f, 0.f, -114.25f), glm::vec3(0.f, -90.f, 0.f));
+	this->PlaceObject(initialized, mapAssets, PIPE, glm::vec3(51.f, 0.f, -118.f), glm::vec3(90.f, 0.f, 0.f));
+	this->PlaceObject(initialized, mapAssets, PIPE, glm::vec3(51.f, 0.f, -117.f), glm::vec3(90.f, 0.f, 0.f));
+	this->PlaceObject(initialized, mapAssets, PIPE, glm::vec3(51.f, 0.f, -116.f), glm::vec3(90.f, 0.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(31.f, 0.f, -114.25f), glm::vec3(0.f, -90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(4.f, 0.f, -119.f), glm::vec3(0.f, 90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_FORK, glm::vec3(-0.75f, 0.f, -141.25f), glm::vec3(0.f, 180.f, 0.f));
@@ -983,9 +992,7 @@ void Renderer::Shoot(bool shoot)
 		glm::vec3 direction = glm::normalize(m_camera_target_position - m_camera_position);
 		for (int i = 0; i < this->m_collidables_nodes.size(); i++)
 		{
-			CollidableNode* node = m_collidables_nodes[i];
-			//std::cout << "node type being shot : " << node->GetType() << std::endl;
-			if (node->GetType() == MAP_ASSETS::CH_IRIS || node->GetType() == MAP_ASSETS::CH_CANNON)
+			if (m_collidables_nodes[i]->GetType() == MAP_ASSETS::CH_IRIS || m_collidables_nodes[i]->GetType() == MAP_ASSETS::CH_CANNON)
 			{
 				if (CalculateDistance(m_camera_position, m_collidables_nodes[i]->GetPosition()) > 75.f) continue;
 
@@ -993,7 +1000,7 @@ void Renderer::Shoot(bool shoot)
 				int32_t primID = -1;
 				if (m_collidables_nodes[i]->intersectRay(m_camera_position, direction, m_world_matrix, isectT, primID))
 				{
-					if (node->GetType() == MAP_ASSETS::CH_CANNON)
+					if (m_collidables_nodes[i]->GetType() == MAP_ASSETS::CH_CANNON)
 					{
 						m_collidables_nodes.erase(m_collidables_nodes.begin() + i);
 						m_nodes.erase(m_nodes.begin() + i);
@@ -1055,7 +1062,6 @@ void Renderer::Shoot(bool shoot)
 						m_nodes[x]->model_matrix = Move(*m_nodes[x], newPos);
 						m_nodes[x]->m_aabb.center = glm::vec3(m_nodes[x]->model_matrix * glm::vec4(m_nodes[x]->m_aabb.center, 1.f));
 						m_nodes[x]->SetPosition(newPos);
-						
 					}
 					break;
 				}
