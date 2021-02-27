@@ -12,6 +12,7 @@ uniform sampler2D uniform_tex_albedo;
 uniform sampler2D uniform_tex_mask;
 uniform sampler2D uniform_tex_depth;
 
+uniform int flag;
 uniform float gamma = 2.2;
 
 // for perspective projection only
@@ -68,11 +69,24 @@ void main(void)
 	((pixel.x < halfRes.x + 15) && (pixel.y < halfRes.y + 15)) && 
 	((pixel.x > halfRes.x - 15) && (pixel.y > halfRes.y - 15)))
 	{
-		out_color = vec4(1.0, 1.0, 1.0, 1.0);
+		float g = flag > 0 ? 0.0 : 1.0;
+		float b = flag > 0 ? 0.0 : 1.0;
+		out_color = vec4(1.0, g, b, 1.0);
 	}
 #endif
 
 #ifdef HDR
 	out_color *= vec4(hdr(), 1.0); // looks too bright if it's not multiplied
 #endif
+	
+	if (flag > 0)
+	{
+		vec2 uv = f_texcoord;
+		float r = 0.1;
+		vec2 center = vec2(0.5);
+		vec2 pos = uv - center;
+		float dist = sqrt(pos.x * pos.x + pos.y * pos.y);
+		if (dist < r) out_color *= vec4(0.96, 0.96, 0.7, 0.75);
+	}
+	
 }

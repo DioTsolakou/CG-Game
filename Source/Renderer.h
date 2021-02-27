@@ -21,6 +21,8 @@ protected:
 	glm::vec3										m_camera_up_vector;
 	glm::vec2										m_camera_movement;
 	glm::vec2										m_camera_look_angle_destination;
+	bool											shoot_flag;
+	float											last_shoot = -2.f;
 	
 	float m_continous_time;
 	float FOV;

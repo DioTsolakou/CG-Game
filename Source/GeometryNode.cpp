@@ -11,7 +11,6 @@ GeometryNode::GeometryNode()
 	m_vbo_texcoords = 0;
 	m_vbo_tangents = 0;
 	m_vbo_bitangents = 0;
-	renderable = true;
 }
 
 GeometryNode::~GeometryNode()
@@ -156,4 +155,46 @@ void GeometryNode::Init(GeometricMesh* mesh)
 	}
 
 	this->m_aabb.center = (this->m_aabb.min + this->m_aabb.max) * 0.5f;
+}
+
+glm::mat4 GeometryNode::Scale(glm::vec3 s, bool flag)
+{
+	model_matrix = glm::scale(glm::mat4(1.f), s);
+	if (flag) m_aabb.center = glm::vec3(model_matrix * glm::vec4(m_aabb.center, 1.f));
+	SetScale(s);
+	return model_matrix;
+}
+
+glm::mat4 GeometryNode::Move(glm::vec3 p, bool flag)
+{
+	model_matrix = glm::translate(glm::mat4(1.f), p);
+	if (flag) m_aabb.center = glm::vec3(model_matrix * glm::vec4(m_aabb.center, 1.f));
+	SetPosition(p);
+	return model_matrix;
+}
+
+glm::mat4 GeometryNode::Rotate(glm::vec3 r, bool flag)
+{
+	glm::mat4 rotationX;
+	glm::mat4 rotationY;
+	glm::mat4 rotationZ;
+
+	rotationX = glm::rotate(glm::mat4(1.f), glm::radians(r.x), glm::vec3(1.f, 0.f, 0.f));
+	rotationY = glm::rotate(glm::mat4(1.f), glm::radians(r.y), glm::vec3(0.f, 1.f, 0.f));
+	rotationZ = glm::rotate(glm::mat4(1.f), glm::radians(r.z), glm::vec3(0.f, 0.f, 1.f));
+
+	model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(m_aabb.center.x, m_aabb.center.y, m_aabb.center.z)) *
+		(rotationZ * rotationY * rotationX) *
+		glm::translate(glm::mat4(1.f), glm::vec3(-m_aabb.center.x, -m_aabb.center.y, -m_aabb.center.z));
+	if (flag) m_aabb.center = glm::vec3(model_matrix * glm::vec4(m_aabb.center, 1.f));
+
+	SetRotation(r);
+
+	return model_matrix;
+}
+
+void GeometryNode::Place(glm::vec3 m, glm::vec3 r, glm::vec3 s)
+{
+	model_matrix = Move(m) * Rotate(r) * Scale(s);
+	m_aabb.center = glm::vec3(model_matrix * glm::vec4(m_aabb.center, 1.f));
 }
