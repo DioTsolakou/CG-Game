@@ -892,7 +892,7 @@ void Renderer::BuildMap(bool& initialized, std::array<const char*, MAP_ASSETS::S
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-5.75f, 0.f, -121.25f), glm::vec3(0.f, 0.f, 0.f));
 
 	// right path
-	this->PlaceObject(initialized, mapAssets, CORRIDOR_RIGHT, glm::vec3(5.f, 0.f, -20.f), glm::vec3(0.f, 0.f, 0.f));
+	this->PlaceObject(initialized, mapAssets, CORRIDOR_RIGHT,  glm::vec3(5.f, 0.f, -20.f), glm::vec3(0.f, 0.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(10.f, 0.f, -40.f), glm::vec3(0.f, 0.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(32.25f, 0.f, -51.75f), glm::vec3(180.f, 90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(44.f, 0.f, -74.0f), glm::vec3(0.f, 0.f, 0.f));
