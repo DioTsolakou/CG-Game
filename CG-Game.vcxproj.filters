@@ -76,12 +76,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\basic_rendering.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Assets\Shaders\basic_rendering.vert">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="Assets\Shaders\post_process.frag">
       <Filter>Resource Files</Filter>
     </None>
