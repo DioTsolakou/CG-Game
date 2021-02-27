@@ -11,7 +11,7 @@ class GeometryNode
 private:
 	int type;
 	glm::vec3 position;
-	bool renderable;
+	glm::vec3 rotation;
 public:
 	GeometryNode();
 	virtual ~GeometryNode();
@@ -27,8 +27,13 @@ public:
 		position.y = p.y;
 		position.z = p.z;
 	}
-	int GetRenderable() { return renderable; }
-	void SetRenderable(bool r) { renderable = r; }
+	glm::vec3 GetRotation() { return rotation; }
+	void SetRotation(glm::vec3 r)
+	{
+		rotation.x = r.x;
+		rotation.y = r.y;
+		rotation.z = r.z;
+	}
 
 	struct Objects
 	{

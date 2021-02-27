@@ -385,12 +385,17 @@ void Renderer::RenderPostProcess()
 	glBindTexture(GL_TEXTURE_2D, m_fbo_depth_texture);
 	m_post_program.loadInt("uniform_tex_depth", 6);
 
+	shoot_flag = m_continous_time - last_shoot < 0.15;
+	m_post_program.loadInt("flag", shoot_flag);
+
 	glBindVertexArray(m_vao_fbo);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	
 	m_post_program.Unbind();
 }
 
@@ -404,7 +409,14 @@ void Renderer::RenderStaticGeometry()
 
 	for (auto& node : this->m_nodes)
 	{
-		if (!node->GetRenderable()) continue;
+		/*if (node->GetType() == MAP_ASSETS::CANNON)
+		{
+			if (node->GetRotation().x > 30 || node->GetRotation().x < -30) f *= -1;
+			node->SetRotation(glm::vec3(node->GetRotation().x + f, node->GetRotation().y, node->GetRotation().z));
+			node->model_matrix = Renderer::Rotate(*node, glm::vec3(node->GetRotation().x, node->GetRotation().y, node->GetRotation().z));
+			node->m_aabb.center = glm::vec3(node->model_matrix * glm::vec4(node->m_aabb.center, 1.f));
+		}*/
+
 		glBindVertexArray(node->m_vao);
 
 		m_geometry_program.loadMat4("uniform_projection_matrix", proj * node->app_model_matrix);
@@ -784,6 +796,7 @@ void Renderer::PlaceObject(bool &init, std::array<const char*, MAP_ASSETS::SIZE_
 			temp = node;
 		}
 		temp->SetPosition(move);
+		temp->SetRotation(rotate);
 		temp->model_matrix = Renderer::Move(*temp, move) * Renderer::Rotate(*temp, rotate) * Renderer::Scale(*temp, scale);
 		temp->m_aabb.center = glm::vec3(temp->model_matrix * glm::vec4(temp->m_aabb.center, 1.f));
 		delete mesh;
@@ -803,7 +816,7 @@ void Renderer::BuildMap(bool& initialized, std::array<const char*, MAP_ASSETS::S
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_FORK, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, WALL, glm::vec3(-9.5f, 0.f, -19.5f), glm::vec3(0.f, 0.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, WALL, glm::vec3(9.5f, 0.f, -19.5f), glm::vec3(0.f, 0.f, 0.f));
-
+	/*
 	this->PlaceObject(initialized, mapAssets, PIPE, glm::vec3(0.f, 0.f, -11.f), glm::vec3(90.f, 0.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, BEAM, glm::vec3(0.f, 0.f, -18.f), glm::vec3(0.f, 0.f, 90.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_LEFT, glm::vec3(-5.f, 0.f, -20.f), glm::vec3(0.f, 0.f, 0.f));
@@ -825,9 +838,11 @@ void Renderer::BuildMap(bool& initialized, std::array<const char*, MAP_ASSETS::S
 	this->PlaceObject(initialized, mapAssets, CANNON, glm::vec3(-87.5f, 3.45f, 15.95f), glm::vec3(15.f, 90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CANNON, glm::vec3(-87.5f, 3.45f, 14.55f), glm::vec3(15.f, 90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-109.5f, 0.f, 27.f), glm::vec3(0.f, 90.f, 0.f));
+	*/
 	this->PlaceObject(initialized, mapAssets, CANNON_MOUNT, glm::vec3(-109.5f, -3.f, 17.f), glm::vec3(180.f, 90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CANNON, glm::vec3(-107.5f, -2.f, 15.95f), glm::vec3(-15.f, 90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CANNON, glm::vec3(-107.5f, -2.f, 14.55f), glm::vec3(-15.f, 90.f, 0.f));
+	/*
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-129.5f, 0.f, 27.f), glm::vec3(0.f, 90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CANNON_MOUNT, glm::vec3(-139.5f, 5.f, 17.f), glm::vec3(0.f, 90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, CANNON, glm::vec3(-137.5f, 3.45f, 15.95f), glm::vec3(15.f, 90.f, 0.f));
@@ -933,7 +948,7 @@ void Renderer::BuildMap(bool& initialized, std::array<const char*, MAP_ASSETS::S
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_CURVE, glm::vec3(-12.5f, 2.f, -192.25f), glm::vec3(-17.f, -90.f, 0.f));
 	this->PlaceObject(initialized, mapAssets, WALL, glm::vec3(-15.f, 8.f, -209.f), glm::vec3(90.f, 0.f, 90.f));
 	this->PlaceObject(initialized, mapAssets, CORRIDOR_STRAIGHT, glm::vec3(-26.75f, 5.f, -199.f), glm::vec3(0.f, 90.f, 0.f), glm::vec3(1.f, 1.f, 0.75f));
-
+	*/
 	this->m_world_matrix = glm::mat4(1.f);
 }
 
@@ -989,6 +1004,7 @@ void Renderer::Shoot(bool shoot)
 {
 	if (shoot)
 	{
+		last_shoot = m_continous_time;
 		glm::vec3 direction = glm::normalize(m_camera_target_position - m_camera_position);
 		for (int i = 0; i < this->m_collidables_nodes.size(); i++)
 		{
@@ -1007,37 +1023,6 @@ void Renderer::Shoot(bool shoot)
 					}
 					else
 					{
-						/*for (int j = i - 2; j < i + 1; j++) {
-							if (m_collidables_nodes[j]->GetType() == MAP_ASSETS::CH_WALL ||
-								m_collidables_nodes[j]->GetType() == MAP_ASSETS::CH_IRIS)
-							{
-								m_collidables_nodes.erase(m_collidables_nodes.begin() + j);
-								m_nodes.erase(m_nodes.begin() + j);
-							}
-						}*/
-
-						/*int wallPos = m_collidables_nodes[i-1]->GetType() == MAP_ASSETS::CH_WALL ? 1 : 2;
-						int irisPos = wallPos == 1 ? 1 : -1;
-
-						m_collidables_nodes.erase(m_collidables_nodes.begin() + i + irisPos);
-						m_nodes.erase(m_nodes.begin() + i + irisPos);
-
-						m_collidables_nodes.erase(m_collidables_nodes.begin() + i - wallPos);
-						m_nodes.erase(m_nodes.begin() + i - wallPos;*/
-
-						/*int pos = m_collidables_nodes[i-1]->GetType() == MAP_ASSETS::CH_WALL ? 0 : 1;
-						if (pos == 1) {
-							m_collidables_nodes.erase(m_collidables_nodes.begin() + i - 1);
-							m_nodes.erase(m_nodes.begin() + i - 1);
-							m_collidables_nodes.erase(m_collidables_nodes.begin() + i - 1);
-							m_nodes.erase(m_nodes.begin() + i - 1);
-						}
-						else {
-							m_collidables_nodes.erase(m_collidables_nodes.begin() + i - 1);
-							m_nodes.erase(m_nodes.begin() + i - 1);
-							m_collidables_nodes.erase(m_collidables_nodes.begin() + i + 1);
-							m_nodes.erase(m_nodes.begin() + i + 1);
-						}*/
 
 						glm::vec3 newPos = glm::vec3(0.f, 100.f, 0.f);
 
