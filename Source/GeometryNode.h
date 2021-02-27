@@ -5,11 +5,14 @@
 #include "GLEW\glew.h"
 #include <unordered_map>
 #include "glm\gtx\hash.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 class GeometryNode
 {
 private:
 	int type;
+	glm::vec3 scale;
 	glm::vec3 position;
 	glm::vec3 rotation;
 public:
@@ -20,20 +23,29 @@ public:
 
 	int GetType() { return type; }
 	void SetType(int t) { type = t; }
-	glm::vec3 GetPosition() { return position; }
-	void SetPosition(glm::vec3 p) 
+
+	glm::vec3 GetScale() { return scale; }
+	void SetScale(glm::vec3 s)
 	{
-		position.x = p.x;
-		position.y = p.y;
-		position.z = p.z;
+		scale.x = s.x; scale.y = s.y; scale.z = s.z;
 	}
+	glm::mat4 Scale(glm::vec3 s, bool flag = false);
+
+	glm::vec3 GetPosition() { return position; }
+	void SetPosition(glm::vec3 p)
+	{
+		position.x = p.x; position.y = p.y; position.z = p.z;
+	}
+	glm::mat4 Move(glm::vec3 p, bool flag = false);
+
 	glm::vec3 GetRotation() { return rotation; }
 	void SetRotation(glm::vec3 r)
 	{
-		rotation.x = r.x;
-		rotation.y = r.y;
-		rotation.z = r.z;
+		rotation.x = r.x; rotation.y = r.y; rotation.z = r.z;
 	}
+	glm::mat4 Rotate(glm::vec3 r, bool flag = false);
+
+	void Place(glm::vec3 m, glm::vec3 r, glm::vec3 s);
 
 	struct Objects
 	{
