@@ -128,7 +128,7 @@ float shadow(vec3 pwcs)
 	if (plcs.x > 1.0) return 0.0;
 	if (plcs.y > 1.0) return 0.0;
 
-	// set scale of light space z vaule to [0, 1]
+	// set scale of light space z value to [0, 1]
 	plcs.z = 0.5 * plcs.z + 0.5;
 
 	// sample shadow map
@@ -246,7 +246,7 @@ void main(void)
 
 	float cosTheta = clamp(dot(surfToEye, surfToLight), 0,1);
 
-	uniform_constant_bias = 0.0035*tan(acos(cosTheta));
+	uniform_constant_bias = 0.005*tan(acos(cosTheta));
 
 	// check if we have shadows
 	float shadow_value = (uniform_cast_shadows == 1) ? shadow(pos_wcs.xyz) : 1.0;
