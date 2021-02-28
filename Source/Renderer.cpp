@@ -408,7 +408,10 @@ void Renderer::RenderStaticGeometry()
 
 	for (auto& node : this->m_nodes)
 	{
-		if (!FrustumClipping(proj, *node)) continue;
+		if (node->GetType() != MAP_ASSETS::PIPE)
+		{
+			if (!FrustumClipping(proj, *node)) continue;
+		}
 
 		glEnable(GL_CULL_FACE);
 		if (node->GetType() == MAP_ASSETS::PIPE) // pipes disappear for some reason if you look at them from the back
