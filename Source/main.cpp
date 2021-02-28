@@ -160,7 +160,7 @@ void mouseInput(bool &mouse_button_pressed, bool& right_mouse_button_pressed, gl
 			renderer->Shoot(true);
 			mouse_button_pressed = (event.type == SDL_MOUSEBUTTONDOWN);
 		}
-		else if (event.button.button == SDL_BUTTON_RIGHT)
+		else if (event.button.button == SDL_BUTTON_RIGHT) //&& event.button.repeat)
 		{
 			right_mouse_button_pressed = (event.type == SDL_MOUSEBUTTONDOWN);
 		}
@@ -177,6 +177,8 @@ void mouseInput(bool &mouse_button_pressed, bool& right_mouse_button_pressed, gl
 			right_mouse_button_pressed = (event.type == SDL_MOUSEBUTTONUP);
 		}
 	}
+	renderer->Zoom(right_mouse_button_pressed);
+
 }
 
 void showFPS()

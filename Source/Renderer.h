@@ -118,6 +118,7 @@ public:
 	void										CollisionDetection(glm::vec3& direction);
 	float										CalculateDistance(glm::vec3 u, glm::vec3);
 	void										Shoot(bool shoot);
+	void										Zoom(bool zoom);
 };
 
 #endif
