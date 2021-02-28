@@ -12,7 +12,8 @@ uniform sampler2D uniform_tex_albedo;
 uniform sampler2D uniform_tex_mask;
 uniform sampler2D uniform_tex_depth;
 
-uniform int flag;
+uniform int shoot_flag;
+uniform int hit_flag;
 uniform float gamma = 2.2;
 
 // for perspective projection only
@@ -52,6 +53,7 @@ vec3 hdr()
 //#define PREVIEW_SHADOW_MAP
 #define CROSS_HAIR
 #define HDR
+#define SHOOT
 
 void main(void)
 {
@@ -69,8 +71,8 @@ void main(void)
 	((pixel.x < halfRes.x + 15) && (pixel.y < halfRes.y + 15)) && 
 	((pixel.x > halfRes.x - 15) && (pixel.y > halfRes.y - 15)))
 	{
-		float g = flag > 0 ? 0.0 : 1.0;
-		float b = flag > 0 ? 0.0 : 1.0;
+		float g = hit_flag > 0 ? 0.0 : 1.0;
+		float b = hit_flag > 0 ? 0.0 : 1.0;
 		out_color = vec4(1.0, g, b, 1.0);
 	}
 #endif
@@ -78,8 +80,9 @@ void main(void)
 #ifdef HDR
 	out_color *= vec4(hdr(), 1.0); // looks too bright if it's not multiplied
 #endif
-	
-	if (flag > 0)
+
+#ifdef SHOOT
+	if (shoot_flag > 0)
 	{
 		vec2 uv = f_texcoord;
 		float r = 0.1;
@@ -88,5 +91,6 @@ void main(void)
 		float dist = sqrt(pos.x * pos.x + pos.y * pos.y);
 		if (dist < r) out_color *= vec4(0.96, 0.96, 0.7, 0.75);
 	}
+#endif
 	
 }

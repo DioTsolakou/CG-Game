@@ -22,7 +22,9 @@ protected:
 	glm::vec2										m_camera_movement;
 	glm::vec2										m_camera_look_angle_destination;
 	bool											shoot_flag;
+	bool											hit_flag;
 	float											last_shoot = -2.f;
+	float											last_hit = -2.f;
 	
 	float m_continous_time;
 	float FOV;
