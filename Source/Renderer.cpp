@@ -315,9 +315,6 @@ void Renderer::UpdateCamera(float dt)
 
 	m_view_matrix = glm::lookAt(m_camera_position, m_camera_target_position, m_camera_up_vector);
 
-	//std::cout << m_camera_position.x << " " << m_camera_position.y << " " << m_camera_position.z << " " << std::endl;
-	//std::cout << m_camera_target_position.x << " " << m_camera_target_position.y << " " << m_camera_target_position.z << " " << std::endl;
-	//std::cout << m_light.GetTarget().x << " " << m_light.GetTarget().y << " " << m_light.GetTarget().z << " " << std::endl;
 	this->m_light.SetPosition(m_camera_position);
 	this->m_light.SetTarget(m_camera_target_position);
 }
@@ -535,7 +532,6 @@ void Renderer::RenderCollidableGeometry()
 
 			glDrawArrays(GL_TRIANGLES, node->parts[j].start_offset, node->parts[j].count);
 			totalRenderedPrims += node->parts[j].count;
-
 		}
 
 		glBindVertexArray(0);
@@ -656,9 +652,6 @@ void Renderer::RenderShadowMaps()
 
 		glm::mat4 proj = m_light.GetProjectionMatrix() * m_light.GetViewMatrix() * m_world_matrix;
 
-		/*glEnable(GL_CULL_FACE);
-		glCullFace(GL_FRONT);*/
-
 		for (auto& node : this->m_nodes)
 		{
 			glBindVertexArray(node->m_vao);
@@ -696,7 +689,6 @@ void Renderer::RenderShadowMaps()
 
 		m_spot_light_shadow_map_program.Unbind();
 		glDisable(GL_DEPTH_TEST);
-		//glDisable(GL_CULL_FACE);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }
@@ -726,46 +718,46 @@ void Renderer::CameraLook(glm::vec2 lookDir)
 	m_camera_look_angle_destination = lookDir * glm::vec2(1.5f, 1.5f);
 }
 
-void Renderer::CameraRollLeft(bool enable)
+void Renderer::CameraRollLeft(bool enable) // removed, looked weird
 {
 	glm::mat4 roll_mat = glm::rotate(glm::mat4(1.0f), glm::radians(5.f), m_camera_target_position);
 	m_camera_up_vector = glm::mat3(roll_mat) * m_camera_up_vector;
 }
 
-void Renderer::CameraRollRight(bool enable)
+void Renderer::CameraRollRight(bool enable) // removed, looked weird
 {
 	glm::mat4 roll_mat = glm::rotate(glm::mat4(1.0f), glm::radians(-5.f), m_camera_target_position);
 	m_camera_up_vector = glm::mat3(roll_mat) * m_camera_up_vector;
 }
 
-glm::mat4 Renderer::Move(GeometryNode& object, glm::vec3 movement)
-{
-	object.model_matrix = glm::translate(glm::mat4(1.f), movement);
-	return object.model_matrix;
-}
+//glm::mat4 Renderer::Move(GeometryNode& object, glm::vec3 movement)
+//{
+//	object.model_matrix = glm::translate(glm::mat4(1.f), movement);
+//	return object.model_matrix;
+//}
 
-glm::mat4 Renderer::Rotate(GeometryNode& object, glm::vec3 rotation)
-{
-	glm::mat4 rotationX;
-	glm::mat4 rotationY;
-	glm::mat4 rotationZ;
+//glm::mat4 Renderer::Rotate(GeometryNode& object, glm::vec3 rotation)
+//{
+//	glm::mat4 rotationX;
+//	glm::mat4 rotationY;
+//	glm::mat4 rotationZ;
+//
+//	rotationX = glm::rotate(glm::mat4(1.f), glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
+//	rotationY = glm::rotate(glm::mat4(1.f), glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
+//	rotationZ = glm::rotate(glm::mat4(1.f), glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
+//
+//	object.model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(object.m_aabb.center.x, object.m_aabb.center.y, object.m_aabb.center.z)) *
+//		(rotationZ * rotationY * rotationX) *
+//		glm::translate(glm::mat4(1.f), glm::vec3(-object.m_aabb.center.x, -object.m_aabb.center.y, -object.m_aabb.center.z));
+//
+//	return object.model_matrix;
+//}
 
-	rotationX = glm::rotate(glm::mat4(1.f), glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
-	rotationY = glm::rotate(glm::mat4(1.f), glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
-	rotationZ = glm::rotate(glm::mat4(1.f), glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
-
-	object.model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(object.m_aabb.center.x, object.m_aabb.center.y, object.m_aabb.center.z)) *
-		(rotationZ * rotationY * rotationX) *
-		glm::translate(glm::mat4(1.f), glm::vec3(-object.m_aabb.center.x, -object.m_aabb.center.y, -object.m_aabb.center.z));
-
-	return object.model_matrix;
-}
-
-glm::mat4 Renderer::Scale(GeometryNode& object, glm::vec3 scale)
-{
-	object.model_matrix = glm::scale(glm::mat4(1.f), scale);
-	return object.model_matrix;
-}
+//glm::mat4 Renderer::Scale(GeometryNode& object, glm::vec3 scale)
+//{
+//	object.model_matrix = glm::scale(glm::mat4(1.f), scale);
+//	return object.model_matrix;
+//}
 
 void Renderer::PlaceObject(bool &init, std::array<const char*, MAP_ASSETS::SIZE_ALL> &map_assets, MAP_ASSETS asset, glm::vec3 move, glm::vec3 rotate, glm::vec3 scale)
 {
@@ -999,7 +991,7 @@ void Renderer::CollisionDetection(glm::vec3& direction)
 	for (auto& node : this->m_collidables_nodes)
 	{
 		if (CalculateDistance(m_camera_position, node->GetPosition()) > distance) continue;
-		//std::cout << "checking with " << node->GetPosition().x << " " << node->GetPosition().y << " " << node->GetPosition().z << std::endl;
+
 		float_t isectT = 0.f;
 		int32_t primID = -1;
 		isectDst.clear();
@@ -1053,30 +1045,9 @@ void Renderer::Shoot(bool shoot)
 						m_nodes[i]->Move(newPos);
 						m_collidables_nodes[i]->Move(newPos);
 
-						/*m_collidables_nodes[i-1]->model_matrix = Move(*m_collidables_nodes[i-1], newPos);
-						m_collidables_nodes[i-1]->m_aabb.center = glm::vec3(m_collidables_nodes[i - 1]->model_matrix * glm::vec4(m_collidables_nodes[i - 1]->m_aabb.center, 1.f));
-						m_collidables_nodes[i-1]->SetPosition(newPos);
-						m_nodes[i - 1]->model_matrix = Move(*m_nodes[i - 1], newPos);
-						m_nodes[i - 1]->m_aabb.center = glm::vec3(m_nodes[i - 1]->model_matrix * glm::vec4(m_nodes[i - 1]->m_aabb.center, 1.f));
-						m_nodes[i - 1]->SetPosition(newPos);*/
-
-						/*m_collidables_nodes[i]->model_matrix = Move(*m_collidables_nodes[i], newPos);
-						m_collidables_nodes[i]->m_aabb.center = glm::vec3(m_collidables_nodes[i]->model_matrix * glm::vec4(m_collidables_nodes[i]->m_aabb.center, 1.f));
-						m_collidables_nodes[i]->SetPosition(newPos);
-						m_nodes[i]->model_matrix = Move(*m_nodes[i], newPos);
-						m_nodes[i]->m_aabb.center = glm::vec3(m_nodes[i]->model_matrix * glm::vec4(m_nodes[i]->m_aabb.center, 1.f));
-						m_nodes[i]->SetPosition(newPos);*/
-
 						int x = m_collidables_nodes[i-1]->GetType() == MAP_ASSETS::CH_WALL ? i+1 : i-2;
 						m_nodes[x]->Move(newPos);
 						m_collidables_nodes[x]->Move(newPos);
-
-						/*m_collidables_nodes[x]->model_matrix = Move(*m_collidables_nodes[x], newPos);
-						m_collidables_nodes[x]->m_aabb.center = glm::vec3(m_collidables_nodes[x]->model_matrix * glm::vec4(m_collidables_nodes[x]->m_aabb.center, 1.f));
-						m_collidables_nodes[x]->SetPosition(newPos);
-						m_nodes[x]->model_matrix = Move(*m_nodes[x], newPos);
-						m_nodes[x]->m_aabb.center = glm::vec3(m_nodes[x]->model_matrix * glm::vec4(m_nodes[x]->m_aabb.center, 1.f));
-						m_nodes[x]->SetPosition(newPos);*/
 					}
 					break;
 				}

@@ -4,7 +4,6 @@
 
 GeometricMesh::GeometricMesh(){}
 
-
 OBJMaterial* GeometricMesh::findMaterial(std::string str)
 {
 	if (str.empty()) str = "default";
@@ -51,6 +50,7 @@ void GeometricMesh::printObjects(void)
 	}
 
 }
+
 void GeometricMesh::printMaterials(void)
 {
 	if (materials.empty()) printf(" NO MATERIALS \n");

@@ -5,11 +5,9 @@
 #include <iostream>
 
 CollidableNode::CollidableNode(void) :
-    GeometryNode()
-{ /* Empty */
-}
+    GeometryNode(){}
 
-CollidableNode::~CollidableNode(void) { /* Empty */ }
+CollidableNode::~CollidableNode(void){}
 
 void CollidableNode::Init(class GeometricMesh* mesh)
 {
@@ -25,7 +23,6 @@ void CollidableNode::Init(class GeometricMesh* mesh)
     super::Init(mesh);
 }
 
-//private
 bool CollidableNode::intersectRay(
     const glm::vec3& pOrigin_wcs,
     const glm::vec3& pDir_wcs,
@@ -39,7 +36,7 @@ bool CollidableNode::intersectRay(
 {
     if (pTmax < pTmin || glm::length(pDir_wcs) < glm::epsilon<float>()) return false;
 
-    glm::vec3 normDir = pDir_wcs;// glm::normalize(pDir_wcs);
+    glm::vec3 normDir = pDir_wcs; // glm::normalize(pDir_wcs);
 
     glm::mat4 rotationX = glm::rotate(glm::mat4(1.f), glm::radians(angleX), glm::vec3(1.f, 0.f, 0.f));
     glm::mat4 rotationY = glm::rotate(glm::mat4(1.f), glm::radians(angleY), glm::vec3(0.f, 1.f, 0.f));

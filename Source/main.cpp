@@ -5,7 +5,7 @@
 #include "Renderer.h"
 #include <thread>         // std::this_thread::sleep_for
 
-#define FPS_INTERVAL 1.0 //seconds.
+#define FPS_INTERVAL 1.0 // seconds.
 
 using namespace std;
 

@@ -13,7 +13,6 @@ OBJLoader::OBJLoader(void)
 	mesh = nullptr;
 }
 
-
 OBJLoader::~OBJLoader(void){}
 
 /*
@@ -88,7 +87,7 @@ GeometricMesh* OBJLoader::load(const char* filename)
 	// if normals doesn't exist create them
 	if (mesh->normals.empty())
 	{
-		printf("normals not found\n");
+		//printf("normals not found\n"); // commented out, only the collision hulls of curves don't have
 
 		bool flatShading = false;
 		if (flatShading) calculate_flat_normals();
@@ -434,6 +433,7 @@ void OBJLoader::read_usemtl(const char* buff, int& currentMaterialID)
 	}
 	currentMaterialID = mesh->objects.back().material_id;
 }
+
 void OBJLoader::read_mtllib(const char* buff, const char* filename)
 {
 	char temp[1024];
@@ -445,6 +445,7 @@ void OBJLoader::read_mtllib(const char* buff, const char* filename)
 	str = folder + str;
 	parseMTL(str.c_str());
 }
+
 void OBJLoader::add_new_group(const char* buff, int& currentMaterialID)
 {
 	char name[1024];
