@@ -408,13 +408,7 @@ void Renderer::RenderStaticGeometry()
 
 	for (auto& node : this->m_nodes)
 	{
-		/*if (node->GetType() == MAP_ASSETS::CANNON)
-		{
-			if (node->GetRotation().x > 30 || node->GetRotation().x < -30) f *= -1;
-			node->SetRotation(glm::vec3(node->GetRotation().x + f, node->GetRotation().y, node->GetRotation().z));
-			node->model_matrix = Renderer::Rotate(*node, glm::vec3(node->GetRotation().x, node->GetRotation().y, node->GetRotation().z));
-			node->m_aabb.center = glm::vec3(node->model_matrix * glm::vec4(node->m_aabb.center, 1.f));
-		}*/
+		if (!FrustumClipping(proj, *node)) continue;
 
 		glBindVertexArray(node->m_vao);
 
@@ -693,9 +687,9 @@ void Renderer::RenderShadowMaps()
 	}
 }
 
-void Renderer::CameraMoveForward(bool enable, float factor)
+void Renderer::CameraMoveForward(bool enable)
 {
-	m_camera_movement.x = (enable) ? 2*factor : 0;
+	m_camera_movement.x = (enable) ? 2 : 0;
 }
 
 void Renderer::CameraMoveBackWard(bool enable)
@@ -730,35 +724,6 @@ void Renderer::CameraRollRight(bool enable) // removed, looked weird
 	m_camera_up_vector = glm::mat3(roll_mat) * m_camera_up_vector;
 }
 
-//glm::mat4 Renderer::Move(GeometryNode& object, glm::vec3 movement)
-//{
-//	object.model_matrix = glm::translate(glm::mat4(1.f), movement);
-//	return object.model_matrix;
-//}
-
-//glm::mat4 Renderer::Rotate(GeometryNode& object, glm::vec3 rotation)
-//{
-//	glm::mat4 rotationX;
-//	glm::mat4 rotationY;
-//	glm::mat4 rotationZ;
-//
-//	rotationX = glm::rotate(glm::mat4(1.f), glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
-//	rotationY = glm::rotate(glm::mat4(1.f), glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
-//	rotationZ = glm::rotate(glm::mat4(1.f), glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
-//
-//	object.model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(object.m_aabb.center.x, object.m_aabb.center.y, object.m_aabb.center.z)) *
-//		(rotationZ * rotationY * rotationX) *
-//		glm::translate(glm::mat4(1.f), glm::vec3(-object.m_aabb.center.x, -object.m_aabb.center.y, -object.m_aabb.center.z));
-//
-//	return object.model_matrix;
-//}
-
-//glm::mat4 Renderer::Scale(GeometryNode& object, glm::vec3 scale)
-//{
-//	object.model_matrix = glm::scale(glm::mat4(1.f), scale);
-//	return object.model_matrix;
-//}
-
 void Renderer::PlaceObject(bool &init, std::array<const char*, MAP_ASSETS::SIZE_ALL> &map_assets, MAP_ASSETS asset, glm::vec3 move, glm::vec3 rotate, glm::vec3 scale)
 {
 	OBJLoader loader;
@@ -789,18 +754,36 @@ void Renderer::PlaceObject(bool &init, std::array<const char*, MAP_ASSETS::SIZE_
 			node->SetType(asset);
 			temp = node;
 		}
-		/*
-		temp->SetPosition(move);
-		temp->SetRotation(rotate);
-		temp->model_matrix = Renderer::Move(*temp, move) * Renderer::Rotate(*temp, rotate) * Renderer::Scale(*temp, scale);
-		temp->m_aabb.center = glm::vec3(temp->model_matrix * glm::vec4(temp->m_aabb.center, 1.f));
-		*/
 		temp->Place(move, rotate, scale);
 		delete mesh;
 	}
 	else
 	{
 		init = false;
+	}
+}
+
+void Renderer::ExtractPlanesFromFrustum(glm::mat4 MVP, bool normalize)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		m_frustum_planes[0][i] = MVP[i][3] + MVP[i][0]; // left plane
+		m_frustum_planes[1][i] = MVP[i][3] - MVP[i][0]; // right plane
+		m_frustum_planes[2][i] = MVP[i][3] + MVP[i][1]; // bottom plane
+		m_frustum_planes[3][i] = MVP[i][3] - MVP[i][1]; // top plane
+		m_frustum_planes[4][i] = MVP[i][3] + MVP[i][2]; // near plane
+		m_frustum_planes[5][i] = MVP[i][3] - MVP[i][2]; // far plane
+	}
+
+	if (normalize)
+	{
+		for (int i = 0; i < 6; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				m_frustum_planes[i][j] = glm::normalize(m_frustum_planes[i][j]);
+			}
+		}
 	}
 }
 
@@ -1006,6 +989,40 @@ void Renderer::CollisionDetection(glm::vec3& direction)
 			}
 		}
 	}
+}
+
+bool Renderer::FrustumClipping(glm::mat4 MVP, GeometryNode& node)
+{
+	ExtractPlanesFromFrustum(MVP, true);
+	node.ExtractMinMaxFromAABB(node);
+
+	for (int i = 0; i < 6; i++)
+	{
+		int out = 0;
+		out += glm::dot(m_frustum_planes[i], glm::vec4(node.m_aabb.min.x, node.m_aabb.min.y, node.m_aabb.min.z, 1.0f)) < 0.f ? 1 : 0;
+		out += glm::dot(m_frustum_planes[i], glm::vec4(node.m_aabb.max.x, node.m_aabb.min.y, node.m_aabb.min.z, 1.0f)) < 0.f ? 1 : 0;
+
+		out += glm::dot(m_frustum_planes[i], glm::vec4(node.m_aabb.min.x, node.m_aabb.max.y, node.m_aabb.min.z, 1.0f)) < 0.f ? 1 : 0;
+		out += glm::dot(m_frustum_planes[i], glm::vec4(node.m_aabb.max.x, node.m_aabb.max.y, node.m_aabb.min.z, 1.0f)) < 0.f ? 1 : 0;
+
+		out += glm::dot(m_frustum_planes[i], glm::vec4(node.m_aabb.min.x, node.m_aabb.min.y, node.m_aabb.max.z, 1.0f)) < 0.f ? 1 : 0;
+		out += glm::dot(m_frustum_planes[i], glm::vec4(node.m_aabb.max.x, node.m_aabb.min.y, node.m_aabb.max.z, 1.0f)) < 0.f ? 1 : 0;
+
+		out += glm::dot(m_frustum_planes[i], glm::vec4(node.m_aabb.min.x, node.m_aabb.max.y, node.m_aabb.max.z, 1.0f)) < 0.f ? 1 : 0;
+		out += glm::dot(m_frustum_planes[i], glm::vec4(node.m_aabb.max.x, node.m_aabb.max.y, node.m_aabb.max.z, 1.0f)) < 0.f ? 1 : 0;
+
+		if (out == 8) return false;
+	}
+
+	int out;
+	out = 0; for (int i = 0; i < 8; i++) out += ((m_frustum_planes[i].x > node.m_aabb.max.x) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((m_frustum_planes[i].x < node.m_aabb.min.x) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((m_frustum_planes[i].y > node.m_aabb.max.y) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((m_frustum_planes[i].y < node.m_aabb.min.y) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((m_frustum_planes[i].z > node.m_aabb.max.z) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((m_frustum_planes[i].z < node.m_aabb.min.z) ? 1 : 0); if (out == 8) return false;
+
+	return true;
 }
 
 float Renderer::CalculateDistance(glm::vec3 u, glm::vec3 v) 

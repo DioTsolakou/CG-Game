@@ -72,9 +72,11 @@ protected:
 	void RenderShadowMaps();
 	void RenderPostProcess();
 	void PlaceObject(bool& init, std::array<const char*, MAP_ASSETS::SIZE_ALL>& map_assets, MAP_ASSETS asset, glm::vec3 move, glm::vec3 rotate, glm::vec3 scale = glm::vec3(1.f, 1.f, 1.f));
+	void ExtractPlanesFromFrustum(glm::mat4 MVP, bool normalize = false);
 
 	std::vector<GeometryNode*> m_nodes;
 	std::vector<CollidableNode*> m_collidables_nodes;
+	glm::vec4 m_frustum_planes[6];
 
 	LightNode									m_light;
 	ShaderProgram								m_geometry_program;
@@ -106,7 +108,7 @@ public:
 	bool										ReloadShaders();
 	void										Render();
 
-	void										CameraMoveForward(bool enable, float factor);
+	void										CameraMoveForward(bool enable);
 	void										CameraMoveBackWard(bool enable);
 	void										CameraMoveLeft(bool enable);
 	void										CameraMoveRight(bool enable);
@@ -118,6 +120,7 @@ public:
 	glm::mat4									Scale(GeometryNode& object, glm::vec3 scale);
 	void										BuildMap(bool &initialized, std::array<const char*, MAP_ASSETS::SIZE_ALL> mapAssets);
 	void										CollisionDetection(glm::vec3& direction);
+	bool										FrustumClipping(glm::mat4 MVP, GeometryNode& node);
 	float										CalculateDistance(glm::vec3 u, glm::vec3);
 	void										Shoot(bool shoot);
 	void										Zoom(bool zoom);

@@ -74,6 +74,8 @@ public:
 
 	void Place(glm::vec3 m, glm::vec3 r, glm::vec3 s);
 
+	void ExtractMinMaxFromAABB(GeometryNode& node);
+
 	struct Objects
 	{
 		unsigned int start_offset;
@@ -97,6 +99,9 @@ public:
 		glm::vec3 max;
 		glm::vec3 center;
 	};
+
+	glm::vec4 m_aabb_max_planes;
+	glm::vec4 m_aabb_min_planes;
 
 	std::vector<Objects> parts;
 

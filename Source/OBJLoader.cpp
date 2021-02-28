@@ -88,6 +88,7 @@ GeometricMesh* OBJLoader::load(const char* filename)
 	if (mesh->normals.empty())
 	{
 		//printf("normals not found\n"); // commented out, only the collision hulls of curves don't have
+		printf("Loading...\n");
 
 		bool flatShading = false;
 		if (flatShading) calculate_flat_normals();

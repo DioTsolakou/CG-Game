@@ -198,3 +198,9 @@ void GeometryNode::Place(glm::vec3 m, glm::vec3 r, glm::vec3 s)
 	model_matrix = Move(m) * Rotate(r) * Scale(s);
 	m_aabb.center = glm::vec3(model_matrix * glm::vec4(m_aabb.center, 1.f));
 }
+
+void GeometryNode::ExtractMinMaxFromAABB(GeometryNode& node)
+{
+	m_aabb_max_planes = glm::vec4(node.m_aabb.max.x, node.m_aabb.max.y, node.m_aabb.max.z, 1.0f);
+	m_aabb_min_planes = glm::vec4(node.m_aabb.min.x, node.m_aabb.min.y, node.m_aabb.min.z, 1.0f);
+}

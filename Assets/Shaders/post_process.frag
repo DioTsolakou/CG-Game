@@ -89,7 +89,7 @@ void main(void)
 		vec2 center = vec2(0.5);
 		vec2 pos = uv - center;
 		float dist = sqrt(pos.x * pos.x + pos.y * pos.y);
-		if (dist < r) out_color *= vec4(0.96, 0.96, 0.7, 0.75);
+		if (dist < r) out_color *= vec4(0.96, 0.96, 0.7, 1.0);
 	}
 #endif
 	
