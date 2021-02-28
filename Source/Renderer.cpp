@@ -410,6 +410,12 @@ void Renderer::RenderStaticGeometry()
 	{
 		if (!FrustumClipping(proj, *node)) continue;
 
+		glEnable(GL_CULL_FACE);
+		if (node->GetType() == MAP_ASSETS::PIPE) // pipes disappear for some reason if you look at them from the back
+		{
+			glDisable(GL_CULL_FACE); // disabling back face culling doesn't seem to fix it
+		}
+
 		glBindVertexArray(node->m_vao);
 
 		m_geometry_program.loadMat4("uniform_projection_matrix", proj * node->app_model_matrix);
