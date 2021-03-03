@@ -34,10 +34,10 @@ int TextureManager::findTexture(const char* filename, bool hasMipmaps)
 GLuint TextureManager::RequestTexture(const char* filename, bool hasMipmaps)
 {
 	// first check if we can find it in the manager
-	//int index = findTexture(filename, hasMipmaps);
+	int index = findTexture(filename, hasMipmaps);
 
-	//if (index != -1)
-	//	return textures[index].textureID;
+	if (index != -1)
+		return textures[index].textureID;
 
 	// load the texture
 	SDL_Surface* surf = IMG_Load(filename);
@@ -63,12 +63,12 @@ GLuint TextureManager::RequestTexture(const char* filename, bool hasMipmaps)
 	case 3: // no alpha channel
 		if (surf->format->Rmask == 0x000000ff) texture_format = GL_RGB;
 		else texture_format = GL_BGR;
-		nOfColors = GL_COMPRESSED_RGB; // compressed takes more time during load but much less RAM, from 6gb to barely 2gb
+		nOfColors = GL_RGB; // compressed takes more time during load but much less RAM, from 6gb to barely 2gb
 		break;
 	case 4: // contains alpha channel
 		if (surf->format->Rmask == 0x000000ff)	 texture_format = GL_RGBA;
 		else texture_format = GL_BGRA;
-		nOfColors = GL_COMPRESSED_RGBA; // compressed takes more time during load but much less RAM, from 6gb to barely 2gb
+		nOfColors = GL_RGBA; // compressed takes more time during load but much less RAM, from 6gb to barely 2gb
 		break;
 
 	default:
